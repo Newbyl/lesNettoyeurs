@@ -1,0 +1,7 @@
+- Trouver comment afficher une map en 2D
+- Faire les nettoyeurs
+- Faire une page de login
+- Faire une page de creation de nettoyeur
+- Faire une page pour le choix de l'équipe après création du perso
+- Connecter l'appli aux webservices
+
