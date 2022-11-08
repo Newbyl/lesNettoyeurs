@@ -1,9 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">lesNettoyeurs</string>
     <string name="connexion">Connexion</string>
     <string name="pseudo">Pseudo</string>
     <string name="mot_de_passe">Mot de passe</string>
-    <string name="todo" translatable="false">TODO</string>
-    <string name="logo" translatable="false">TODO</string>
     <string name="se_connecter">Se connecter</string>
+
 </resources>
