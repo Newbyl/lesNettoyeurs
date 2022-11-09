@@ -101,4 +101,15 @@
         app:layout_constraintVertical_bias="0.742"
         tools:ignore="TextContrastCheck" />
 
+    <TextView
+        android:id="@+id/Messageerreur"
+        android:layout_width="253dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="204dp"
+        android:layout_marginEnd="80dp"
+        android:textAlignment="center"
+        android:textColor="#F10C0C"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

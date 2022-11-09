@@ -6,5 +6,6 @@
     <string name="se_connecter">Se connecter</string>
     <string name="erreurmdp">Le mot de passe est vide</string>
     <string name="erreurlogin">pseudo oublié</string>
+    <string name="erreurconnexion">Pseudo ou mot de passe de faux</string>
 
 </resources>

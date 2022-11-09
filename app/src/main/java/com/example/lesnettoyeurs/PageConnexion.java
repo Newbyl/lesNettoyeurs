@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -32,12 +33,13 @@ import javax.xml.parsers.ParserConfigurationException;
 public class PageConnexion extends AppCompatActivity {
 
     private static final String TAG= "Information" ;
-    boolean connecter;
+    private  boolean connecter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Button connexion= findViewById(R.id.seconnecter);
 
@@ -46,23 +48,23 @@ public class PageConnexion extends AppCompatActivity {
             public void onClick(View view) {
                 EditText login = findViewById(R.id.Pseudo);
                 EditText password = findViewById(R.id.Password);
+                TextView messageerruer= findViewById(R.id.Messageerreur);
                 if(login.length()==0 ){
-                    Log.d(TAG,"Passe par là");
+                    messageerruer.setText("");
                     login.setError(getResources().getString(R.string.erreurlogin));
                 }
 
                 else if(password.length()==0 ){
-                    Log.d(TAG,"Passe par là");
-                    password.setError(getResources().getString(R.string.erreurlogin));
+                    messageerruer.setText("");
+                    password.setError(getResources().getString(R.string.erreurmdp));
                 }
                 else{
-                PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString());
-                    if (PageConnexion.this.connecter){
+                     if (PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString())){
                         Intent intent= new Intent(PageConnexion.this, MapsActivity.class);
                         startActivity(intent);
                     }
                     else {
-
+                      messageerruer.setText(getResources().getString(R.string.erreurconnexion));
 
                     }
 
@@ -81,10 +83,9 @@ public class PageConnexion extends AppCompatActivity {
 
     }
 
-    private void Connexion (String pseudo,String mdp) {
+    private boolean Connexion (String pseudo,String mdp) {
 
-
-        this.connecter = false;
+        connecter = false;
 
         // haschage du mot de passe en SHA-256
         MessageDigest md = null;
@@ -106,7 +107,6 @@ public class PageConnexion extends AppCompatActivity {
 
         // COnnexion au serveur
 
-
         URL url = null;
         Thread tr;
         String finalPseudo = pseudo;
@@ -125,9 +125,11 @@ public class PageConnexion extends AppCompatActivity {
                     NodeList Node = doc.getElementsByTagName("STATUS");
                     org.w3c.dom.Node nodeStatus = Node.item(0);
                     String teststatus = nodeStatus.getTextContent();
+                    Log.d(TAG,teststatus);
                     if (teststatus.equals("OK")) {
-                        PageConnexion.this.connecter = true;
+                        PageConnexion.this.connecter=true;
                     }
+
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -144,8 +146,13 @@ public class PageConnexion extends AppCompatActivity {
             }
         });
         tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-
+        return connecter;
     }
 
     private void registerComponentCallbacks() {
