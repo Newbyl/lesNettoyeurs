@@ -6,4 +6,7 @@
     <string name="todo" translatable="false">TODO</string>
     <string name="logo" translatable="false">TODO</string>
     <string name="se_connecter">Se connecter</string>
+    <string name="erreurmdp">mot de passe est vide</string>
+    <string name="title_activity_maps" translatable="false">MapsActivity</string>
+    <string name="erreurlogin">pseudo oublié</string>
 </resources>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".PageConnexion">
 
     <ImageView
         android:id="@+id/imageView3"
@@ -34,7 +34,7 @@
         app:srcCompat="@drawable/_2068__1_" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/Password"
         android:layout_width="253dp"
         android:layout_height="61dp"
         android:autofillHints=""
@@ -81,13 +81,13 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.462"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.237" />
+        app:layout_constraintVertical_bias="0.203" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/seconnecter"
         android:layout_width="165dp"
         android:layout_height="62dp"
         android:background="@drawable/btn_connexion"

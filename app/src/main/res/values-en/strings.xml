@@ -4,5 +4,7 @@
     <string name="pseudo">Pseudo</string>
     <string name="mot_de_passe">Password</string>
     <string name="se_connecter">Log in</string>
+    <string name="erreurmdp">fff</string>
+    <string name="erreurlogin">fff</string>
 
 </resources>
