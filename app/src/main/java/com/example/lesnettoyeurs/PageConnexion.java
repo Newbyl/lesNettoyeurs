@@ -33,7 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class PageConnexion extends AppCompatActivity {
 
     private static final String TAG= "Information" ;
-    private  boolean connecter;
+    private Joueur joueur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class PageConnexion extends AppCompatActivity {
                     password.setError(getResources().getString(R.string.erreurmdp));
                 }
                 else{
-                     if (PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString())){
+                     if (PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString())!= null ){
                         Intent intent= new Intent(PageConnexion.this, MapsActivity.class);
                         startActivity(intent);
                     }
@@ -83,9 +83,9 @@ public class PageConnexion extends AppCompatActivity {
 
     }
 
-    private boolean Connexion (String pseudo,String mdp) {
+    private Joueur Connexion (String pseudo,String mdp) {
 
-        connecter = false;
+        joueur=null;
 
         // haschage du mot de passe en SHA-256
         MessageDigest md = null;
@@ -116,7 +116,7 @@ public class PageConnexion extends AppCompatActivity {
                 try {
                     URL url = new URL("http://51.68.124.144/nettoyeurs_srv/connexion.php?" + "&login=" + URLEncoder.encode(pseudo, "UTF-8") + "&passwd=" + URLEncoder.encode(mdphaché, "UTF-8"));
 
-
+                    Log.d(TAG,url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -125,9 +125,11 @@ public class PageConnexion extends AppCompatActivity {
                     NodeList Node = doc.getElementsByTagName("STATUS");
                     org.w3c.dom.Node nodeStatus = Node.item(0);
                     String teststatus = nodeStatus.getTextContent();
-                    Log.d(TAG,teststatus);
                     if (teststatus.equals("OK")) {
-                        PageConnexion.this.connecter=true;
+                            NodeList Node1 = doc.getElementsByTagName("PARAMS");
+                            String session = Node1.item(0).getChildNodes().item(0).getTextContent();
+                            String signature = Node1.item(0).getChildNodes().item(1).getTextContent();
+                            joueur=new Joueur(session,signature);
                     }
 
 
@@ -152,7 +154,7 @@ public class PageConnexion extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        return connecter;
+        return joueur;
     }
 
     private void registerComponentCallbacks() {
