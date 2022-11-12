@@ -1,4 +1,4 @@
-package com.example.lesnettoyeurs;
+package com.example.lesnettoyeurs.Modele;
 
 public class Joueur {
 

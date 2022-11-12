@@ -1,4 +1,4 @@
-package com.example.lesnettoyeurs;
+package com.example.lesnettoyeurs.Controleur;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.lesnettoyeurs.R;
+import com.example.lesnettoyeurs.Modele.Joueur;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -60,7 +63,7 @@ public class PageConnexion extends AppCompatActivity {
                 }
                 else{
                      if (PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString())!= null ){
-                        Intent intent= new Intent(PageConnexion.this, MapsActivity.class);
+                        Intent intent= new Intent(PageConnexion.this, Map.class);
                         startActivity(intent);
                     }
                     else {
