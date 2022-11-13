@@ -1,10 +1,15 @@
 package com.example.lesnettoyeurs.Controleur;
 
+import static java.security.AccessController.getContext;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.lesnettoyeurs.Modele.Universite;
 import com.example.lesnettoyeurs.R;
@@ -17,11 +22,15 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
 public class Map extends AppCompatActivity {
     private MapView map;
+    private View mMapView;
+    private MyLocationNewOverlay mLocationOverlay;
 
 
     @Override
@@ -72,9 +81,26 @@ public class Map extends AppCompatActivity {
 
         map.getOverlayManager().add(polygon);
 
+        /*this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getApplicationContext()), (MapView) mMapView);
+        this.mLocationOverlay.enableMyLocation();
+        ((MapView) mMapView).getOverlays().add(this.mLocationOverlay);*/
+
+
 
 
     }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mMapView = new MapView(inflater.getContext());
+        return mMapView;
+    }
+
+
+
+
+
+
+
     @Override
     protected void onPause() {
         super.onPause();
