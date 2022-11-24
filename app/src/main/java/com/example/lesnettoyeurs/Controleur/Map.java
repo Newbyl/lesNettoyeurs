@@ -5,6 +5,7 @@ package com.example.lesnettoyeurs.Controleur;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -46,24 +47,17 @@ public class Map extends AppCompatActivity {
         Configuration.getInstance().load( getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_map);
         Universite information= new Universite();
-
-
         //Creation map
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK); //render
         map.setMultiTouchControls(true);;//zoom avec doigt
-
         IMapController mapController = map.getController();
         mapController.setZoom(16.5); //Dans le zoom de depart
         mapController.setCenter(information.getUniversite()); //permet de faire un centrage vers l'Universite
-
-
-
         // Creation de Overlay pour indiquer la position du batiment 3IA
         ArrayList<OverlayItem> item =new ArrayList<>();
         OverlayItem IA =  new OverlayItem("3IA","Creation de netoyeur", information.getBatimentinfo());
         item.add(IA);
-
         ItemizedIconOverlay<OverlayItem> mo = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),item, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
@@ -77,23 +71,13 @@ public class Map extends AppCompatActivity {
         });
         mo.setDrawFocusedItem(true);
         map.getOverlays().add(mo);
-
-
-
-
         //Creation du contour de l'Universite
         Polygon polygon = new Polygon();
-
         polygon.getOutlinePaint().setColor(Color.argb(75, 255,0,0));
         polygon.setPoints(information.getGeoPoints());
         polygon.setTitle("L'universite d'orlean");
-
-
         map.getOverlayManager().add(polygon);
-
         Bitmap pBleu = BitmapFactory.decodeResource(getResources(), R.drawable.pbleu);
-
-
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
         this.mLocationOverlay.setDirectionArrow( pBleu, pBleu );
         this.mLocationOverlay.setPersonIcon(pBleu);
