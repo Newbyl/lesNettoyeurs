@@ -1,15 +1,20 @@
 package com.example.lesnettoyeurs.Controleur;
 
-import static java.security.AccessController.getContext;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 
 import com.example.lesnettoyeurs.Modele.Universite;
 import com.example.lesnettoyeurs.R;
@@ -17,11 +22,12 @@ import com.example.lesnettoyeurs.R;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
+
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
+
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -31,6 +37,7 @@ public class Map extends AppCompatActivity {
     private MapView map;
     private View mMapView;
     private MyLocationNewOverlay mLocationOverlay;
+
 
 
     @Override
@@ -56,6 +63,7 @@ public class Map extends AppCompatActivity {
         ArrayList<OverlayItem> item =new ArrayList<>();
         OverlayItem IA =  new OverlayItem("3IA","Creation de netoyeur", information.getBatimentinfo());
         item.add(IA);
+
         ItemizedIconOverlay<OverlayItem> mo = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),item, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
@@ -71,6 +79,8 @@ public class Map extends AppCompatActivity {
         map.getOverlays().add(mo);
 
 
+
+
         //Creation du contour de l'Universite
         Polygon polygon = new Polygon();
 
@@ -81,9 +91,17 @@ public class Map extends AppCompatActivity {
 
         map.getOverlayManager().add(polygon);
 
-        /*this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getApplicationContext()), (MapView) mMapView);
+        Bitmap pBleu = BitmapFactory.decodeResource(getResources(), R.drawable.pbleu);
+
+
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
+        this.mLocationOverlay.setDirectionArrow( pBleu, pBleu );
+        this.mLocationOverlay.setPersonIcon(pBleu);
         this.mLocationOverlay.enableMyLocation();
-        ((MapView) mMapView).getOverlays().add(this.mLocationOverlay);*/
+        map.getOverlays().add(this.mLocationOverlay);
+
+
+
 
 
 

@@ -51,14 +51,14 @@ public class PageConnexion extends AppCompatActivity {
             public void onClick(View view) {
                 EditText login = findViewById(R.id.Pseudo);
                 EditText password = findViewById(R.id.Password);
-                TextView messageerruer= findViewById(R.id.Messageerreur);
+                TextView message_erreur= findViewById(R.id.Messageerreur);
                 if(login.length()==0 ){
-                    messageerruer.setText("");
+                    message_erreur.setText("");
                     login.setError(getResources().getString(R.string.erreurlogin));
                 }
 
                 else if(password.length()==0 ){
-                    messageerruer.setText("");
+                    message_erreur.setText("");
                     password.setError(getResources().getString(R.string.erreurmdp));
                 }
                 else{
@@ -67,7 +67,7 @@ public class PageConnexion extends AppCompatActivity {
                         startActivity(intent);
                     }
                     else {
-                      messageerruer.setText(getResources().getString(R.string.erreurconnexion));
+                      message_erreur.setText(getResources().getString(R.string.erreurconnexion));
 
                     }
 
