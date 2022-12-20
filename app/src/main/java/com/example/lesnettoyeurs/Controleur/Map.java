@@ -122,11 +122,11 @@ public class Map extends AppCompatActivity implements LocationListener  {
         Bitmap pBleu = BitmapFactory.decodeResource(getResources(), R.drawable.pbleu);
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
         this.mLocationOverlay.setDirectionArrow( pBleu, pBleu );
+
         this.mLocationOverlay.setPersonIcon(pBleu);
         this.mLocationOverlay.enableMyLocation();
+
         map.getOverlays().add(this.mLocationOverlay);
-
-
 
 
         GeoPoint myLocationGeo = this.mLocationOverlay.getMyLocation();
@@ -134,19 +134,15 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (locationManager != null) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                this.onLocationChanged(location);
+                this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
+
             }
         }
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        this.onLocationChanged(location);
-        this.creationNettoyeur(joueur.getSession(), joueur.getSignature(),String.valueOf(longitude),String.valueOf(latitude));
-
-
-
-
-
-
-
     }
 
 
@@ -247,13 +243,6 @@ public class Map extends AppCompatActivity implements LocationListener  {
         mMapView = new MapView(inflater.getContext());
         return mMapView;
     }
-
-
-
-
-
-
-
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
