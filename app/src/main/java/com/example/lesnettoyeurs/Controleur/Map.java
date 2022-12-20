@@ -4,16 +4,23 @@ package com.example.lesnettoyeurs.Controleur;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.lesnettoyeurs.Modele.Joueur;
 import com.example.lesnettoyeurs.Modele.Nettoyeur;
 import com.example.lesnettoyeurs.R;
+
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -31,6 +38,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -49,26 +57,30 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-public class Map extends AppCompatActivity {
+public class Map extends AppCompatActivity implements LocationListener  {
     private MapView map;
     private View mMapView;
     private MyLocationNewOverlay mLocationOverlay;
     private Joueur joueur;
+    public LocationManager locationManager;
     private Nettoyeur nettoyeur;
+    double longitude;
+    double latitude;
+
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Configuration.getInstance().load( getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_map);
         Universite information= new Universite();
@@ -76,8 +88,7 @@ public class Map extends AppCompatActivity {
         if (extras != null) {
             joueur = new Joueur(extras.getString("joueur_session"),extras.getString("joueur_signature"));
         }
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
-        this.creationNettoyeur(joueur.getSession(), joueur.getSignature());
+
         //Creation map
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK); //render
@@ -109,12 +120,26 @@ public class Map extends AppCompatActivity {
         polygon.setTitle("L'universite d'Orleans");
         map.getOverlayManager().add(polygon);
         Bitmap pBleu = BitmapFactory.decodeResource(getResources(), R.drawable.pbleu);
-
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
         this.mLocationOverlay.setDirectionArrow( pBleu, pBleu );
         this.mLocationOverlay.setPersonIcon(pBleu);
         this.mLocationOverlay.enableMyLocation();
         map.getOverlays().add(this.mLocationOverlay);
 
+
+
+
+        GeoPoint myLocationGeo = this.mLocationOverlay.getMyLocation();
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (locationManager != null) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            }
+        }
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        this.onLocationChanged(location);
+        this.creationNettoyeur(joueur.getSession(), joueur.getSignature(),String.valueOf(longitude),String.valueOf(latitude));
 
 
 
@@ -124,17 +149,20 @@ public class Map extends AppCompatActivity {
 
     }
 
-    private Nettoyeur creationNettoyeur (String session, String signature) {
+
+
+
+    private void creationNettoyeur (String session, String signature,String longitude, String latitude) {
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
             public void run() {
                 try {
 
-                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/connexion.php?" +
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/new_nettoyeur.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
                             "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
-                            "&lon=" + URLEncoder.encode(String.valueOf(mLocationOverlay.getMyLocation().getLongitude()), "UTF-8")+
-                            "&lat=" + URLEncoder.encode(String.valueOf(mLocationOverlay.getMyLocation().getLatitude()), "UTF-8"));
+                            "&lon=" + URLEncoder.encode((longitude), "UTF-8")+
+                            "&lat=" + URLEncoder.encode((latitude), "UTF-8"));
                     Log.d(TAG,url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
@@ -147,14 +175,46 @@ public class Map extends AppCompatActivity {
                     if (teststatus.equals("OK")) {
                         NodeList Node1 = doc.getElementsByTagName("PARAMS");
                         String nom = Node1.item(0).getChildNodes().item(0).getTextContent();
-                        Nettoyeur n =new Nettoyeur(joueur.getSignature(), nom);
+                        Log.d("OK", "Creation Nettoyeur OK");
+                        nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
                     }
-                    else if ( teststatus.equals("KO-not in 3IA")){
+                    else if ( teststatus.equals("KO - NOT IN 3IA")){
+
                         Context context = getApplicationContext();
-                        CharSequence text = "Placez-vous en 3IA afin de créer votre Nettoyeur !";
+                        Log.d("KO", "Creation Nettoyeur KO");
+
                         int duration = Toast.LENGTH_SHORT;
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Placez-vous en 3IA afin de créer votre Nettoyeur !";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+
+                            }
+                        });
+                        finish();
+
+                    }
+                    else{
+                        URL url_ = new URL("http://51.68.124.144/nettoyeurs_srv/stats_nettoyeur.php?" +
+                                "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                                "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8"));
+                        Log.d(TAG,url_.toString());
+                        URLConnection cnx_ = url_.openConnection();
+                        InputStream in_ = cnx_.getInputStream();
+                        DocumentBuilderFactory dbf_ = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder db_ = dbf_.newDocumentBuilder();
+                        Document doc_ = db_.parse(in_);
+                        NodeList Node_ = doc_.getElementsByTagName("STATUS");
+                        org.w3c.dom.Node nodeStatus_ = Node_.item(0);
+                        String teststatus_ = nodeStatus_.getTextContent();
+                        Log.d("KO", "Nettoyeur déjà la KO");
+                        if (teststatus_.equals("OK")) {
+                            NodeList Node1_ = doc_.getElementsByTagName("PARAMS");
+                            String nom = Node1_.item(0).getChildNodes().item(0).getTextContent();
+                            Log.d("NOM :", nom);
+                            nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
+                        }
                     }
 
 
@@ -180,7 +240,6 @@ public class Map extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        return nettoyeur;
     }
 
 
@@ -195,19 +254,35 @@ public class Map extends AppCompatActivity {
 
 
 
+
     @Override
-    protected void onPause() {
-        super.onPause();
-        map.onPause();
+    public void onLocationChanged(@NonNull Location location) {
+         longitude = location.getLongitude();
+         latitude = location.getLatitude();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        map.onResume();
+    public void onLocationChanged(@NonNull List<Location> locations) {
+        LocationListener.super.onLocationChanged(locations);
     }
 
+    @Override
+    public void onFlushComplete(int requestCode) {
+        LocationListener.super.onFlushComplete(requestCode);
+    }
 
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        LocationListener.super.onStatusChanged(provider, status, extras);
+    }
 
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+        LocationListener.super.onProviderEnabled(provider);
+    }
 
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+        LocationListener.super.onProviderDisabled(provider);
+    }
 }
