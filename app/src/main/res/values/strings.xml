@@ -9,5 +9,5 @@
     <string name="erreurmdp">mot de passe est vide</string>
     <string name="title_activity_maps" translatable="false">MapsActivity</string>
     <string name="erreurlogin">pseudo oublié</string>
-    <string name="erreurconnexion">Pseudo ou mot de passe de faux</string>
+    <string name="erreurconnexion">Pseudo ou mot de passe faux</string>
 </resources>
