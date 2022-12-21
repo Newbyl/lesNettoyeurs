@@ -399,7 +399,6 @@ public class Map extends AppCompatActivity implements LocationListener  {
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
             public void run() {
-                Looper.prepare();
                 try {
                     URL url = new URL("http://51.68.124.144/nettoyeurs_srv/mode_voyage.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
@@ -419,35 +418,41 @@ public class Map extends AppCompatActivity implements LocationListener  {
                         Log.d("OK", "mode VOYAGE");
                         final int DURATION = 60; // duration in seconds
                         final int INTERVAL = 10; // interval in seconds
-                        Context context = getApplicationContext();
-                        int duration = Toast.LENGTH_SHORT;
 
-                        final Handler handler = new Handler();
-                        final Runnable runnable = new Runnable() {
-                            int seconds = DURATION;
-                            @Override
-                            public void run() {
-                                if (seconds > 0) {
-                                    // show the toast with the time remaining
-                                    int duration = Toast.LENGTH_SHORT;
-                                    String message = "Time remaining: " + seconds + " seconds";
-                                    Toast toast = Toast.makeText(getApplicationContext(), message, duration);
-                                    toast.show();
 
-                                    // decrement the time remaining and schedule the next toast
-                                    seconds -= INTERVAL;
-                                    handler.postDelayed(this, INTERVAL * 1000);
-                                } else {
-                                    CharSequence text = "Vous êtes en mode voyage !";
-                                    Toast toast = Toast.makeText(context, text, duration);
-                                    toast.show();
-                                }
-                            }
-                        };
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                handler.post(runnable);
+                                Handler handler = new Handler();
+                                Toast.makeText(getApplicationContext(), "Veuillez rester immobile 1 minutes\n afin de passer en mode voyage", Toast.LENGTH_SHORT).show();
+                                handler.postDelayed(new Runnable() {
+
+                                    final Context context = getApplicationContext();
+                                    final Toast toast = Toast.makeText(context, "Il reste 30 secondes", Toast.LENGTH_SHORT);
+                                    @Override
+                                    public void run() {
+                                        toast.show();
+                                    }
+                                }, 30000);
+                                handler.postDelayed(new Runnable() {
+                                    final Context context = getApplicationContext();
+                                    final Toast toast = Toast.makeText(context, "Il reste 15 secondes", Toast.LENGTH_SHORT);
+                                    @Override
+                                    public void run() {
+                                        toast.show();
+                                    }
+                                }, 45000);
+                                handler.postDelayed(new Runnable() {
+                                    final Context context = getApplicationContext();
+                                    final Toast toast = Toast.makeText(context, "Vous êtes désormais en mode voyage" +
+                                                    "\n rappuyez sur l'avion afin de retourner en jeu"
+                                            , Toast.LENGTH_SHORT);
+                                    @Override
+                                    public void run() {
+                                        toast.show();
+                                    }
+                                }, 60000);
+
                             }
                         });
                     }
