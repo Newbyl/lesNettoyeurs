@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.lesnettoyeurs.Modele.Cible;
 import com.example.lesnettoyeurs.Modele.Joueur;
 import com.example.lesnettoyeurs.Modele.Nettoyeur;
 import com.example.lesnettoyeurs.R;
@@ -20,6 +21,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,12 +50,14 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
 
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -65,8 +70,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
+
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -81,6 +85,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
     private Nettoyeur nettoyeur;
     double longitude;
     double latitude;
+    ArrayList<Cible> listeCibles = new ArrayList<Cible>();
+
 
 
 
@@ -183,6 +189,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 }
             }
         });
+        updatePosition();
     }
 
     private  void updateNettoyeur(){
@@ -246,9 +253,6 @@ public class Map extends AppCompatActivity implements LocationListener  {
             e.printStackTrace();
         }
     }
-
-
-
 
     private void creationNettoyeur (String session, String signature,String longitude, String latitude) {
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
@@ -395,6 +399,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
             e.printStackTrace();
         }
     }
+
     private void miseEnModeVoyage(View view){
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
@@ -478,8 +483,11 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
     }
 
-/**
-    private updatePosition(String session, String signature,String longitude, String latitude) {
+    private void updatePosition() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            this.onLocationChanged(location);
+        }
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
             public void run() {
@@ -488,8 +496,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     URL url = new URL("http://51.68.124.144/nettoyeurs_srv/deplace.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
                             "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
-                            "&lon=" + URLEncoder.encode((longitude), "UTF-8")+
-                            "&lat=" + URLEncoder.encode((latitude), "UTF-8"));
+                            "&lon=" + URLEncoder.encode(String.valueOf(longitude), "UTF-8")+
+                            "&lat=" + URLEncoder.encode(String.valueOf(latitude), "UTF-8"));
                     Log.d(TAG,url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
@@ -501,14 +509,136 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     String teststatus = nodeStatus.getTextContent();
                     //KO - AGENT TRANSITING
                     if (teststatus.equals("OK")) {
-                        NodeList detectedCTR = doc.getElementsByTagName("PARAMS").item(0).getChildNodes();
+                        NodeList detectedCTR = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(0).getChildNodes();
+                        //items
                         for (int i = 0;i<detectedCTR.getLength();i++){
-
+                            NodeList attributItem = detectedCTR.item(i).getChildNodes();
+                            int id=-1;
+                            int value=-1;
+                            double lon=-1;
+                            double lat=-1;
+                            for (int j=0;j<attributItem.getLength();j++){
+                                Node field=attributItem.item(j);
+                                if (field.getNodeName().equalsIgnoreCase("cible_id")){
+                                    id=Integer.parseInt(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("value")){
+                                    value=Integer.parseInt(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("lon")){
+                                    lon=Double.parseDouble(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("lat")){
+                                    lat=Double.parseDouble(field.getTextContent());
+                                }
+                            }
+                            Cible ctr=new Cible(id,value,lon,lat);
+                            listeCibles.add(ctr);
+                            Log.d("Cible trouvé :", ctr.toString());
                         }
-                        NodeList detectedNET = doc.getElementsByTagName("PARAMS").item(1).getChildNodes();
-                        Log.d("OK", "Creation Nettoyeur OK");
-                        nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
+                        NodeList detectedNET = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(1).getChildNodes();
+                        for (int i = 0;i<detectedNET.getLength();i++){
+                            NodeList attributItem = detectedNET.item(i).getChildNodes();
+                            int id=-1;
+                            int value=-1;
+                            double lon=-1;
+                            double lat=-1;
+                            int lifespan=-1;
+                            Boolean estNettoyeur=true;
+
+                            for (int j=0;j<attributItem.getLength();j++){
+                                Node field=attributItem.item(j);
+                                if (field.getNodeName().equalsIgnoreCase("net_id")){
+                                    id=Integer.parseInt(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("value")){
+                                    value=Integer.parseInt(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("lon")){
+                                    lon=Double.parseDouble(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("lat")){
+                                    lat=Double.parseDouble(field.getTextContent());
+                                }
+                                if (field.getNodeName().equalsIgnoreCase("lifespan")){
+                                    lifespan=Integer.parseInt(field.getTextContent());
+                                }
+                            }
+                            Cible net = new Cible(id,value,lon,lat,lifespan,estNettoyeur);
+                            listeCibles.add(net);
+                            Log.d("Nettoyeur trouvé :", net.toString());
+                        }
+
+
+
                     }
+                    Bitmap inspecteur = BitmapFactory.decodeResource(getResources(), R.drawable.nettoyeur);
+                    Bitmap cible_ = BitmapFactory.decodeResource(getResources(), R.drawable.cible);
+                    ArrayList<OverlayItem> itemCTR = new ArrayList<>();
+                    ArrayList<OverlayItem> itemNET = new ArrayList<>();
+                    Drawable cibleDrawable = new BitmapDrawable(getResources(), cible_);
+                    Drawable inspecteurDrawable = new BitmapDrawable(getResources(), inspecteur);
+                    for (int i=0;i<listeCibles.size();i++) {
+                        OverlayItem cible;
+                        if (listeCibles.get(i).getEstNettoyeur()) {
+                            cible = new OverlayItem("Nettoyeur ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
+                            cible.setMarker(inspecteurDrawable);
+                            itemNET.add(cible);
+                        } else {
+                            cible = new OverlayItem("Cible ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
+                            cible.setMarker(cibleDrawable);
+                            itemCTR.add(cible);
+                        }
+
+
+                    }
+                        ItemizedIconOverlay<OverlayItem> ciblesNET = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),itemNET, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                            @Override
+                            public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                //nettoyerNET(Integer.parseInt(item.getSnippet()));
+                                return true;
+                            }
+
+                            @Override
+                            public boolean onItemLongPress(int index, OverlayItem item) {
+                                Context context = getApplicationContext();
+                                Log.d("longItemPressNET", item.getTitle());
+                                int duration = Toast.LENGTH_SHORT;
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        CharSequence text = item.getTitle();
+                                        Toast toast = Toast.makeText(context, text, duration);
+                                        toast.show();
+                                    }
+                                });
+                                return true;
+                            }
+                        });
+                    ItemizedIconOverlay<OverlayItem> ciblesCTR = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),itemCTR, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                        @Override
+                        public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                            //nettoyerCTR(Integer.parseInt(item.getSnippet()));
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onItemLongPress(int index, OverlayItem item) {
+                            Context context = getApplicationContext();
+                            Log.d("longItemPressCTR", item.getTitle());
+                            int duration = Toast.LENGTH_SHORT;
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    CharSequence text = item.getTitle();
+                                    Toast toast = Toast.makeText(context, text, duration);
+                                    toast.show();
+                                }
+                            });
+                            return true;
+                        }
+                    });
+                    map.getOverlays().add(ciblesCTR);
+                    map.getOverlays().add(ciblesNET);
+
 
 
 
@@ -524,6 +654,55 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     e.printStackTrace();
                 }
 
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+/**
+    private void nettoyerCTR(String id){
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/frappe_cible.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
+                            "&cible_id=" + URLEncoder.encode(id, "UTF-8");
+                    Log.d(TAG, url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+
+                    if (teststatus.equals("OK")) {
+
+
+
+                    }
+                    else{
+
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
             }
         });
         tr.start();
