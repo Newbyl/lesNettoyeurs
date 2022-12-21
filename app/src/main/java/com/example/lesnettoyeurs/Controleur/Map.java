@@ -4,6 +4,8 @@ package com.example.lesnettoyeurs.Controleur;
 
 import static android.content.ContentValues.TAG;
 
+import static java.lang.Float.parseFloat;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -22,12 +24,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 
@@ -59,6 +65,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -80,7 +88,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
         Configuration.getInstance().load( getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_map);
         Universite information= new Universite();
@@ -122,26 +130,120 @@ public class Map extends AppCompatActivity implements LocationListener  {
         Bitmap pBleu = BitmapFactory.decodeResource(getResources(), R.drawable.pbleu);
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
         this.mLocationOverlay.setDirectionArrow( pBleu, pBleu );
-
         this.mLocationOverlay.setPersonIcon(pBleu);
         this.mLocationOverlay.enableMyLocation();
-
         map.getOverlays().add(this.mLocationOverlay);
-
-
-        GeoPoint myLocationGeo = this.mLocationOverlay.getMyLocation();
-
-
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (locationManager != null) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 this.onLocationChanged(location);
                 this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
-
             }
+            else{
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                this.onLocationChanged(location);
+                this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
+            }
+        }
+        this.updateNettoyeur();
+        ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
+        if (nettoyeur.getStatus().equals("VOY")){
+            imageButton.setImageResource(R.drawable.atterissage);
+        }
+        else{
+            imageButton.setImageResource(R.drawable.decollage);
+        }
+        imageButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                updateNettoyeur();
+                if (nettoyeur.getStatus().equals("VOY")){
+                    remiseEnJeu(v);
+                    imageButton.setImageResource(R.drawable.decollage);
+                }
+                else if  (nettoyeur.getStatus().equals("PACK")){
+                    Context context = getApplicationContext();
+                    Log.d("KO", "Creation Nettoyeur KO");
+
+                    int duration = Toast.LENGTH_SHORT;
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            CharSequence text = "Vous êtes en préparation pour voyager !";
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
+                    });
+                }
+                else{
+                    imageButton.setImageResource(R.drawable.atterissage);
+                    miseEnModeVoyage(v);
+                }
+            }
+        });
+    }
+
+    private  void updateNettoyeur(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            this.onLocationChanged(location);
+        }
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/stats_nettoyeur.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8") );
+                    Log.d(TAG, url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+                    if (teststatus.equals("OK")) {
+                        NodeList Node1 = doc.getElementsByTagName("PARAMS");
+                        String nom = Node1.item(0) .  getChildNodes().item(0).getTextContent();
+                        String value = Node1.item(0) .  getChildNodes().item(1).getTextContent();
+                        String pos_lon = Node1.item(0) .  getChildNodes().item(2).getTextContent();
+                        String pos_lat = Node1.item(0) .  getChildNodes().item(3).getTextContent();
+                        String status = Node1.item(0) .  getChildNodes().item(4).getTextContent();
+
+                        Log.d("OK", "Stats nettoyeur OK");
+                        if (nettoyeur!=null){
+                            nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
+                        }
+                        nettoyeur.setLatitude(parseFloat(pos_lat));
+                        nettoyeur.setLongitude(parseFloat(pos_lon));
+                        nettoyeur.setValue(value);
+                        nettoyeur.setNom(nom);
+                        nettoyeur.setStatus(status);
+
+
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -170,7 +272,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     String teststatus = nodeStatus.getTextContent();
                     if (teststatus.equals("OK")) {
                         NodeList Node1 = doc.getElementsByTagName("PARAMS");
-                        String nom = Node1.item(0).getChildNodes().item(0).getTextContent();
+                        String nom = Node1.item(0) .  getChildNodes().item(0).getTextContent();
                         Log.d("OK", "Creation Nettoyeur OK");
                         nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
                     }
@@ -237,6 +339,196 @@ public class Map extends AppCompatActivity implements LocationListener  {
         }
 
     }
+
+    private void remiseEnJeu(View view){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            this.onLocationChanged(location);
+        }
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/remise_en_jeu.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8") +
+                            "&lon=" + URLEncoder.encode(String.valueOf((longitude)), "UTF-8") +
+                            "&lat=" + URLEncoder.encode(String.valueOf((latitude)), "UTF-8"));
+                    Log.d(TAG, url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+                    if (teststatus.equals("OK")) {
+                        Context context = getApplicationContext();
+                        Log.d("KO", "retour en jeu OK");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes bien revenu en jeu, mais vous avez été détecté !";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+                        });
+                    }
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (SAXException e) {
+                        e.printStackTrace();
+                    }
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    private void miseEnModeVoyage(View view){
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                Looper.prepare();
+                try {
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/mode_voyage.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8"));
+                    Log.d(TAG, url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+
+                    if (teststatus.equals("OK")) {
+
+                        Log.d("OK", "mode VOYAGE");
+                        final int DURATION = 60; // duration in seconds
+                        final int INTERVAL = 10; // interval in seconds
+                        Context context = getApplicationContext();
+                        int duration = Toast.LENGTH_SHORT;
+
+                        final Handler handler = new Handler();
+                        final Runnable runnable = new Runnable() {
+                            int seconds = DURATION;
+                            @Override
+                            public void run() {
+                                if (seconds > 0) {
+                                    // show the toast with the time remaining
+                                    int duration = Toast.LENGTH_SHORT;
+                                    String message = "Time remaining: " + seconds + " seconds";
+                                    Toast toast = Toast.makeText(getApplicationContext(), message, duration);
+                                    toast.show();
+
+                                    // decrement the time remaining and schedule the next toast
+                                    seconds -= INTERVAL;
+                                    handler.postDelayed(this, INTERVAL * 1000);
+                                } else {
+                                    CharSequence text = "Vous êtes en mode voyage !";
+                                    Toast toast = Toast.makeText(context, text, duration);
+                                    toast.show();
+                                }
+                            }
+                        };
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                handler.post(runnable);
+                            }
+                        });
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+/**
+    private updatePosition(String session, String signature,String longitude, String latitude) {
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/deplace.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
+                            "&lon=" + URLEncoder.encode((longitude), "UTF-8")+
+                            "&lat=" + URLEncoder.encode((latitude), "UTF-8"));
+                    Log.d(TAG,url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+                    //KO - AGENT TRANSITING
+                    if (teststatus.equals("OK")) {
+                        NodeList detectedCTR = doc.getElementsByTagName("PARAMS").item(0).getChildNodes();
+                        for (int i = 0;i<detectedCTR.getLength();i++){
+
+                        }
+                        NodeList detectedNET = doc.getElementsByTagName("PARAMS").item(1).getChildNodes();
+                        Log.d("OK", "Creation Nettoyeur OK");
+                        nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
+                    }
+
+
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }**/
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

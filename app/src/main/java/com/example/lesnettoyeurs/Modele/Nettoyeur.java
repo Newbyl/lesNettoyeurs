@@ -7,12 +7,22 @@ public class Nettoyeur {
     private Float longitude;
     private Float latitude;
     private String status;
+    private String value;
+
+
 
     public Nettoyeur(String nom, String signature) {
         this.nom = nom;
         this.signature = signature;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
     public String getNom() {
         return nom;
     }
