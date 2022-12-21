@@ -189,7 +189,22 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 }
             }
         });
-        updatePosition();
+        Thread threadUpdatePosition= new Thread(new Runnable() {
+            final Handler handler = new Handler();
+            @Override
+            public void run() {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        updatePosition();
+                        handler.postDelayed(this, 15000);
+                    }
+                };
+                handler.postDelayed(runnable, 0);
+            }
+        });
+        threadUpdatePosition.start();
+
     }
 
     private  void updateNettoyeur(){
@@ -595,7 +610,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                         ItemizedIconOverlay<OverlayItem> ciblesNET = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),itemNET, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                             @Override
                             public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                                //nettoyerNET(Integer.parseInt(item.getSnippet()));
+                                nettoyerNET(item.getSnippet());
                                 return true;
                             }
 
@@ -617,7 +632,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     ItemizedIconOverlay<OverlayItem> ciblesCTR = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),itemCTR, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                         @Override
                         public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                            //nettoyerCTR(Integer.parseInt(item.getSnippet()));
+                            nettoyerCTR(item.getSnippet());
                             return true;
                         }
 
@@ -636,8 +651,19 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             return true;
                         }
                     });
-                    map.getOverlays().add(ciblesCTR);
-                    map.getOverlays().add(ciblesNET);
+                    if (map.getOverlays().size()>=5){
+                        Log.d("SIZE",map.getOverlays().size()+"");
+                        map.getOverlays().remove(4);
+                        map.getOverlays().remove(3);
+                        map.postInvalidate();
+                        map.getOverlays().add(3,ciblesCTR);
+                        map.getOverlays().add(4,ciblesNET);
+                    }
+                    else{
+                        map.getOverlays().add(ciblesCTR);
+                        map.getOverlays().add(ciblesNET);
+                    }
+
 
 
 
@@ -664,16 +690,16 @@ public class Map extends AppCompatActivity implements LocationListener  {
         }
 
     }
-/**
-    private void nettoyerCTR(String id){
+
+    private void nettoyerNET(String id){
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/frappe_cible.php?" +
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/frappe_net.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
                             "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
-                            "&cible_id=" + URLEncoder.encode(id, "UTF-8");
+                            "&cible_id=" + URLEncoder.encode(id, "UTF-8"));
                     Log.d(TAG, url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
@@ -683,16 +709,45 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     NodeList Node = doc.getElementsByTagName("STATUS");
                     org.w3c.dom.Node nodeStatus = Node.item(0);
                     String teststatus = nodeStatus.getTextContent();
+                    NodeList Node1 = doc.getElementsByTagName("PARAMS");
 
                     if (teststatus.equals("OK")) {
+                        int outcome = Integer.parseInt(Node1.item(0).getChildNodes().item(0).getTextContent());
 
-
-
+                        String text="";
+                        if (outcome==1 ){
+                            text="Vous avez nettoyer le nettoyeur ennemi bien joué !";
+                        }
+                        if (outcome==0 ){
+                            text="Vous n'avez pas réussi à nettoyer le nettoyeur ennemi, dommage ! ";
+                        }
+                        Context context = getApplicationContext();
+                        Log.d("OK", "Tentative cible (NET)");
+                        final String text2=text;
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast toast = Toast.makeText(context, text2, duration);
+                                toast.show();
+                            }
+                        });
                     }
-                    else{
+                    else {
+                        Context context = getApplicationContext();
+                        Log.d("KO", "Trop loin pour nettoyer la cible (NET)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes trop loin pour nettoyer la cible !";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
 
+                    });
                     }
-                } catch (MalformedURLException e) {
+                    updatePosition();
+                }
+                catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -712,7 +767,91 @@ public class Map extends AppCompatActivity implements LocationListener  {
             e.printStackTrace();
         }
 
-    }**/
+    }
+
+    private void nettoyerCTR(String id){
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/frappe_cible.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
+                            "&cible_id=" + URLEncoder.encode(id, "UTF-8"));
+                    Log.d(TAG, url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+                    NodeList Node1 = doc.getElementsByTagName("PARAMS");
+
+                    if (teststatus.equals("OK")) {
+                        int outcome = Integer.parseInt(Node1.item(0).getChildNodes().item(0).getTextContent());
+                        int detected = Integer.parseInt(Node1.item(0).getChildNodes().item(1).getTextContent());
+                        String text="";
+                        if (outcome==1 && detected==0){
+                            text="Vous avez nettoyer la cible et n'avez pas été detecté !";
+                        }
+                        if (outcome==1 && detected==0){
+                            text="Vous avez nettoyer la cible, malheureusement vous avez été detecté ";
+                        }
+                        if (outcome==0 && detected==1){
+                            text="C'est une catastrophe, vous n'avez pas réussi à nettoyer la cible et avez été detecté ! ";
+                        }
+                        if (outcome==1 && detected==1){
+                            text="Vous avez été detecté et avez nettoyé la cible ";
+                        }
+                        Context context = getApplicationContext();
+                        Log.d("OK", "Tentative cible (CTR)");
+                        final String text2=text;
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast toast = Toast.makeText(context, text2, duration);
+                                toast.show();
+                            }
+                        });
+                    }
+                    else {
+                        Context context = getApplicationContext();
+                        Log.d("KO", "Trop loin pour nettoyer la cible (CTR)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes trop loin pour nettoyer la cible !";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+
+                        });
+                    }
+                    updatePosition();
+                }
+                catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
