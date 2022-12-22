@@ -87,6 +87,13 @@ public class Map extends AppCompatActivity implements LocationListener  {
     double latitude;
     ArrayList<Cible> listeCibles = new ArrayList<Cible>();
 
+    ItemizedIconOverlay<OverlayItem> mo;
+
+    // attributs pour l'update toutes les 15 secondes
+    Handler handler = new Handler();
+    Runnable runnable;
+    int delay = 16 * 1000; // 15000 milliseconds = 15 sec
+
 
 
 
@@ -114,7 +121,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
         ArrayList<OverlayItem> item =new ArrayList<>();
         OverlayItem IA =  new OverlayItem("3IA","Creation de nettoyeur", information.getBatimentinfo());
         item.add(IA);
-        ItemizedIconOverlay<OverlayItem> mo = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),item, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+        mo = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(),item, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
                 return true;
@@ -155,6 +162,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
             }
         }
         this.updateNettoyeur();
+        // Afficher toutes les cibles
+        this.updatePosition();
         ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
         if (nettoyeur.getStatus().equals("VOY")){
             imageButton.setImageResource(R.drawable.atterissage);
@@ -189,6 +198,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 }
             }
         });
+        /*
         Thread threadUpdatePosition= new Thread(new Runnable() {
             final Handler handler = new Handler();
             @Override
@@ -204,6 +214,16 @@ public class Map extends AppCompatActivity implements LocationListener  {
             }
         });
         threadUpdatePosition.start();
+        */
+
+        handler.postDelayed( runnable = new Runnable() {
+            public void run() {
+                updatePosition();
+
+                handler.postDelayed(runnable, delay);
+            }
+        }, delay);
+
 
     }
 
@@ -523,9 +543,15 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     org.w3c.dom.Node nodeStatus = Node.item(0);
                     String teststatus = nodeStatus.getTextContent();
                     //KO - AGENT TRANSITING
+                    Log.d("teststatus",teststatus);
                     if (teststatus.equals("OK")) {
+
+                        // On clear la liste pour ajouté les nouveaux
+                        listeCibles.clear();
+
                         NodeList detectedCTR = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(0).getChildNodes();
                         //items
+                        Log.d("LengthCTR",detectedCTR.getLength()+"");
                         for (int i = 0;i<detectedCTR.getLength();i++){
                             NodeList attributItem = detectedCTR.item(i).getChildNodes();
                             int id=-1;
@@ -551,7 +577,11 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             listeCibles.add(ctr);
                             Log.d("Cible trouvé :", ctr.toString());
                         }
+
+
+
                         NodeList detectedNET = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(1).getChildNodes();
+                        Log.d("Length",detectedNET.getLength()+"");
                         for (int i = 0;i<detectedNET.getLength();i++){
                             NodeList attributItem = detectedNET.item(i).getChildNodes();
                             int id=-1;
@@ -581,6 +611,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             }
                             Cible net = new Cible(id,value,lon,lat,lifespan,estNettoyeur);
                             listeCibles.add(net);
+
                             Log.d("Nettoyeur trouvé :", net.toString());
                         }
 
@@ -593,12 +624,16 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     ArrayList<OverlayItem> itemNET = new ArrayList<>();
                     Drawable cibleDrawable = new BitmapDrawable(getResources(), cible_);
                     Drawable inspecteurDrawable = new BitmapDrawable(getResources(), inspecteur);
+
+
+
                     for (int i=0;i<listeCibles.size();i++) {
                         OverlayItem cible;
                         if (listeCibles.get(i).getEstNettoyeur()) {
                             cible = new OverlayItem("Nettoyeur ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
                             cible.setMarker(inspecteurDrawable);
                             itemNET.add(cible);
+
                         } else {
                             cible = new OverlayItem("Cible ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
                             cible.setMarker(cibleDrawable);
@@ -651,13 +686,18 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             return true;
                         }
                     });
+
+
+
+
                     if (map.getOverlays().size()>=5){
                         Log.d("SIZE",map.getOverlays().size()+"");
                         map.getOverlays().remove(4);
                         map.getOverlays().remove(3);
+
                         map.postInvalidate();
-                        map.getOverlays().add(3,ciblesCTR);
-                        map.getOverlays().add(4,ciblesNET);
+                        map.getOverlays().add(ciblesCTR);
+                        map.getOverlays().add(ciblesNET);
                     }
                     else{
                         map.getOverlays().add(ciblesCTR);
