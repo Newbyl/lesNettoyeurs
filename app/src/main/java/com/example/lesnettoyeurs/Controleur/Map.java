@@ -739,7 +739,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     URL url = new URL("http://51.68.124.144/nettoyeurs_srv/frappe_net.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
                             "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
-                            "&cible_id=" + URLEncoder.encode(id, "UTF-8"));
+                            "&net_id=" + URLEncoder.encode(id, "UTF-8"));
                     Log.d(TAG, url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
