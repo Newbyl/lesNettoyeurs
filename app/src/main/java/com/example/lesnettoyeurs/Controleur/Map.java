@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -60,6 +61,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -84,8 +86,12 @@ public class Map extends AppCompatActivity implements LocationListener  {
     private Joueur joueur;
     public LocationManager locationManager;
     private Nettoyeur nettoyeur;
-    double longitude;
-    double latitude;
+    private double longitude;
+    private double latitude;
+    private String statsEquipe;
+    private String statsSolo;
+
+
     ArrayList<Cible> listeCibles = new ArrayList<Cible>();
 
     ItemizedIconOverlay<OverlayItem> mo;
@@ -118,13 +124,6 @@ public class Map extends AppCompatActivity implements LocationListener  {
         IMapController mapController = map.getController();
         mapController.setZoom(16.5); //Dans le zoom de depart
         mapController.setCenter(information.getUniversite()); //permet de faire un centrage vers l'Universite
-        /*
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        );
-        map.setLayoutParams(params);
-        */
         // Creation de Overlay pour indiquer la position du batiment 3IA
         ArrayList<OverlayItem> item =new ArrayList<>();
         OverlayItem IA =  new OverlayItem("3IA","Creation de nettoyeur", information.getBatimentinfo());
@@ -177,6 +176,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
         ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
 
+
         if (nettoyeur.getStatus().equals("VOY")){
             imageButton.setBackgroundColor(0x88888888);
             imageButton.setImageResource(R.drawable.atterissage);
@@ -228,7 +228,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
         handler.postDelayed( runnable = new Runnable() {
             public void run() {
-                updatePosition();
+                updateStats();
                 updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
                 if (nettoyeur.getStatus().equals("DEAD")){
                     Context context = getApplicationContext();
@@ -239,9 +239,15 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     toast.show();
                     creationNettoyeur();
                 }
+                if (!(nettoyeur.getStatus().equals("VOY")|| nettoyeur.getStatus().equals("PACK") )){
+                    updatePosition();
+                }
+                updateTableau();
                 handler.postDelayed(runnable, delay);
             }
-        }, delay);
+        }, 0);
+
+
 
 
     }
@@ -274,6 +280,9 @@ public class Map extends AppCompatActivity implements LocationListener  {
                         String pos_lon = Node1.item(0) .  getChildNodes().item(2).getTextContent();
                         String pos_lat = Node1.item(0) .  getChildNodes().item(3).getTextContent();
                         String status = Node1.item(0) .  getChildNodes().item(4).getTextContent();
+                        statsSolo= "Nom : "+nom+"\n" +
+                                "Status : "+ status+"\n"+
+                                "Points actuels : "+value;
 
                         Log.d("OK", "Stats nettoyeur OK");
                         if (nettoyeur!=null){
@@ -980,6 +989,64 @@ public class Map extends AppCompatActivity implements LocationListener  {
             e.printStackTrace();
         }
 
+    }
+
+    private void updateStats(){
+
+        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+            @Override
+            public void run() {
+                try {
+
+                    URL url = new URL("http://51.68.124.144/nettoyeurs_srv/stats_equipe.php?" +
+                            "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
+                            "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8"));
+                    Log.d(TAG,url.toString());
+                    URLConnection cnx = url.openConnection();
+                    InputStream in = cnx.getInputStream();
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(in);
+                    NodeList Node = doc.getElementsByTagName("STATUS");
+                    org.w3c.dom.Node nodeStatus = Node.item(0);
+                    String teststatus = nodeStatus.getTextContent();
+                    Log.d("teststatus",teststatus);
+                    if (teststatus.equals("OK")) {
+                        String value  = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(0).getTextContent();
+                        String adv_value  = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(1).getTextContent();
+                        String active_member  = doc.getElementsByTagName("PARAMS").item(0).getChildNodes().item(2).getTextContent();
+                        statsEquipe ="Votre équipe possède "+value+" points \n"+
+                                "L'équipe adverse possède "+adv_value+" points \n"+
+                                "Il y a "+active_member+" joueurs en ligne";
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        tr.start();
+        try {
+            tr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void updateTableau(){
+         TextView tableau = (TextView) findViewById(R.id.tableauStats);
+         tableau.setText(statsSolo+" \n"+statsEquipe);
+         tableau.setTextColor(0xFF000000);
+         tableau.setBackgroundColor(0x88000000);
     }
 
 
