@@ -161,13 +161,13 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 this.onLocationChanged(location);
-                this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
+                this.creationNettoyeur();
             }
             else{
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 this.onLocationChanged(location);
-                this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
+                this.creationNettoyeur();
             }
         }
 
@@ -178,13 +178,15 @@ public class Map extends AppCompatActivity implements LocationListener  {
         ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
 
         if (nettoyeur.getStatus().equals("VOY")){
+            imageButton.setBackgroundColor(0x88888888);
             imageButton.setImageResource(R.drawable.atterissage);
         }
         else{
+            imageButton.setBackgroundColor(0x88888888);
             imageButton.setImageResource(R.drawable.decollage);
         }
         imageButton.setOnClickListener(new View.OnClickListener() {
-
+            @Override
             public void onClick(View v) {
                 updateNettoyeur();
                 if (nettoyeur.getStatus().equals("VOY")){
@@ -205,8 +207,19 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     });
                 }
                 else{
-                    imageButton.setImageResource(R.drawable.atterissage);
                     miseEnModeVoyage(v);
+                    updatePosition();
+                    imageButton.setBackgroundColor(0x00000000);
+                    imageButton.setImageResource(R.drawable.clock);
+                    imageButton.setEnabled(false);
+                    new Handler().postDelayed(new Runnable() {// Ajout d'un délai et une image sur le bouton de mise en voyage afin de savoir quand on est en train de se préparer
+                        @Override
+                        public void run() {
+                            imageButton.setBackgroundColor(0x88888888);
+                            imageButton.setImageResource(R.drawable.atterissage);
+                            imageButton.setEnabled(true);
+                        }
+                    },60000);
                 }
             }
         });
@@ -215,7 +228,16 @@ public class Map extends AppCompatActivity implements LocationListener  {
         handler.postDelayed( runnable = new Runnable() {
             public void run() {
                 updatePosition();
-
+                updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
+                if (nettoyeur.getStatus().equals("DEAD")){
+                    Context context = getApplicationContext();
+                    Log.d("KO", "Mort nettoyeur");
+                    int duration = Toast.LENGTH_SHORT;
+                    CharSequence text = "Vous êtes mort!";
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                    creationNettoyeur();
+                }
                 handler.postDelayed(runnable, delay);
             }
         }, delay);
@@ -285,17 +307,20 @@ public class Map extends AppCompatActivity implements LocationListener  {
         }
     }
 
-    private void creationNettoyeur (String session, String signature,String longitude, String latitude) {
+    private void creationNettoyeur () {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            this.onLocationChanged(location);
+        }
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
             @Override
             public void run() {
                 try {
-
                     URL url = new URL("http://51.68.124.144/nettoyeurs_srv/new_nettoyeur.php?" +
                             "&session=" + URLEncoder.encode(joueur.getSession(), "UTF-8") +
                             "&signature=" + URLEncoder.encode(joueur.getSignature(), "UTF-8")+
-                            "&lon=" + URLEncoder.encode((longitude), "UTF-8")+
-                            "&lat=" + URLEncoder.encode((latitude), "UTF-8"));
+                            "&lon=" + URLEncoder.encode(String.valueOf(longitude), "UTF-8")+
+                            "&lat=" + URLEncoder.encode(String.valueOf(latitude), "UTF-8"));
                     Log.d(TAG,url.toString());
                     URLConnection cnx = url.openConnection();
                     InputStream in = cnx.getInputStream();
@@ -305,18 +330,23 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     NodeList Node = doc.getElementsByTagName("STATUS");
                     org.w3c.dom.Node nodeStatus = Node.item(0);
                     String teststatus = nodeStatus.getTextContent();
+                    Context context = getApplicationContext();
+                    int duration = Toast.LENGTH_SHORT;
+                    Log.d("KO", "Creation Nettoyeur KO");
                     if (teststatus.equals("OK")) {
                         NodeList Node1 = doc.getElementsByTagName("PARAMS");
                         String nom = Node1.item(0) .  getChildNodes().item(0).getTextContent();
                         Log.d("OK", "Creation Nettoyeur OK");
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Bienvenue "+nom+" dans le jeu des Nettoyeurs";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+                        });
                         nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
                     }
                     else if ( teststatus.equals("KO - NOT IN 3IA")){
-
-                        Context context = getApplicationContext();
-                        Log.d("KO", "Creation Nettoyeur KO");
-
-                        int duration = Toast.LENGTH_SHORT;
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 CharSequence text = "Placez-vous en 3IA afin de créer votre Nettoyeur !";
@@ -380,7 +410,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
             Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             this.onLocationChanged(location);
         }
-        Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
+        Thread tr = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -402,6 +432,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
                         Context context = getApplicationContext();
                         Log.d("KO", "retour en jeu OK");
                         int duration = Toast.LENGTH_SHORT;
+                        updatePosition();
+                        updateNettoyeur();
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 CharSequence text = "Vous êtes bien revenu en jeu, mais vous avez été détecté !";
@@ -614,6 +646,14 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
 
                     }
+                    else if (teststatus.equals("KO - AGENT PACKING FOR TRANSIT")){
+                        Log.d("Update position", "KO - AGENT PACKING FOR TRANSIT");
+                        listeCibles.clear();
+                    }
+                    else if (teststatus.equals("KO - AGENT TRANSITING")){
+                        Log.d("Update position", "KO - AGENT TRANSITING");
+                        listeCibles.clear();
+                    }
                     Bitmap inspecteur = BitmapFactory.decodeResource(getResources(), R.drawable.nettoyeur);
                     Bitmap cible_ = BitmapFactory.decodeResource(getResources(), R.drawable.cible);
                     ArrayList<OverlayItem> itemCTR = new ArrayList<>();
@@ -768,6 +808,32 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             }
                         });
                     }
+                    else if (teststatus.equals("KO - AGENT PACKING FOR TRANSIT")){
+                        Context context = getApplicationContext();
+                        Log.d("KO", "préparation voyage impossible de nettoyer (NET)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes en préparation pour le mode voyage, vous ne pouvez pas nettoyer";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+
+                        });
+                    }
+                    else if (teststatus.equals("KO - AGENT TRANSITING")){
+                        Context context = getApplicationContext();
+                        Log.d("KO", "tentative nettoyage en voyage (NET)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes en mode voyage, vous ne pouvez pas nettoyer";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+
+                        });
+                    }
                     else {
                         Context context = getApplicationContext();
                         Log.d("KO", "Trop loin pour nettoyer la cible (NET)");
@@ -850,6 +916,32 @@ public class Map extends AppCompatActivity implements LocationListener  {
                                 Toast toast = Toast.makeText(context, text2, duration);
                                 toast.show();
                             }
+                        });
+                    }
+                    else if (teststatus.equals("KO - AGENT PACKING FOR TRANSIT")){
+                        Context context = getApplicationContext();
+                        Log.d("KO", "préparation voyage impossible de nettoyer (CTR)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes en préparation pour le mode voyage, vous ne pouvez pas nettoyer";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+
+                        });
+                    }
+                    else if (teststatus.equals("KO - AGENT TRANSITING")){
+                        Context context = getApplicationContext();
+                        Log.d("KO", "tentative nettoyage en voyage (CTR)");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes en mode voyage , vous ne pouvez pas nettoyer";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+
                         });
                     }
                     else {
