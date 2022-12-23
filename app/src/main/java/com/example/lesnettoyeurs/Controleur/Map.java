@@ -260,8 +260,10 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 }
             }, 0);
         }
-
-
+        else{
+            finish();
+            return;
+        }
 
 
     }
