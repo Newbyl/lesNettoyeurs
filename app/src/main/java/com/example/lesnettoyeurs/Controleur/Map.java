@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -90,6 +91,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
     private double latitude;
     private String statsEquipe;
     private String statsSolo;
+    private String provider;
 
 
     ArrayList<Cible> listeCibles = new ArrayList<Cible>();
@@ -154,17 +156,30 @@ public class Map extends AppCompatActivity implements LocationListener  {
         this.mLocationOverlay.enableMyLocation();
         map.getOverlays().add(this.mLocationOverlay);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        provider = locationManager.getBestProvider(criteria, true);
+        Log.d("PROVIDER : ", provider);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (locationManager != null) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
-                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                Location location = locationManager.getLastKnownLocation(provider);
+                if(location != null) {
+                    latitude=location.getLatitude();
+                    longitude=location.getLongitude();
+                }
+                locationManager.requestLocationUpdates(provider, 1, 0, this);
+
                 this.onLocationChanged(location);
                 this.creationNettoyeur();
             }
             else{
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location location = locationManager.getLastKnownLocation(provider);
+                if(location != null) {
+                    latitude=location.getLatitude();
+                    longitude=location.getLongitude();
+                }
+                locationManager.requestLocationUpdates(provider, 1, 0, this);
+
                 this.onLocationChanged(location);
                 this.creationNettoyeur();
             }
@@ -254,7 +269,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
     private  void updateNettoyeur(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location location = this.locationManager.getLastKnownLocation(provider);
             this.onLocationChanged(location);
         }
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
@@ -319,7 +334,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
     private void creationNettoyeur () {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location location = this.locationManager.getLastKnownLocation(provider);
             this.onLocationChanged(location);
         }
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
@@ -417,7 +432,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
     private void remiseEnJeu(View view){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location location = this.locationManager.getLastKnownLocation(provider);
             this.onLocationChanged(location);
         }
         Thread tr = new Thread(new Runnable() {
@@ -558,7 +573,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
     private void updatePosition() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location location = this.locationManager.getLastKnownLocation(provider);
             this.onLocationChanged(location);
         }
         Thread tr = new Thread(new Runnable() {//Fonction qui crée un nettoyeur
