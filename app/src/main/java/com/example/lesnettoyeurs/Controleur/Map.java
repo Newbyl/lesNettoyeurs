@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -117,6 +118,13 @@ public class Map extends AppCompatActivity implements LocationListener  {
         IMapController mapController = map.getController();
         mapController.setZoom(16.5); //Dans le zoom de depart
         mapController.setCenter(information.getUniversite()); //permet de faire un centrage vers l'Universite
+        /*
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        map.setLayoutParams(params);
+        */
         // Creation de Overlay pour indiquer la position du batiment 3IA
         ArrayList<OverlayItem> item =new ArrayList<>();
         OverlayItem IA =  new OverlayItem("3IA","Creation de nettoyeur", information.getBatimentinfo());
@@ -147,6 +155,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
         this.mLocationOverlay.enableMyLocation();
         map.getOverlays().add(this.mLocationOverlay);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (locationManager != null) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
@@ -161,10 +170,13 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 this.creationNettoyeur(joueur.getSession(), joueur.getSignature(), String.valueOf(longitude), String.valueOf(latitude));
             }
         }
+
         this.updateNettoyeur();
         // Afficher toutes les cibles
         this.updatePosition();
+
         ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
+
         if (nettoyeur.getStatus().equals("VOY")){
             imageButton.setImageResource(R.drawable.atterissage);
         }
@@ -198,23 +210,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                 }
             }
         });
-        /*
-        Thread threadUpdatePosition= new Thread(new Runnable() {
-            final Handler handler = new Handler();
-            @Override
-            public void run() {
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        updatePosition();
-                        handler.postDelayed(this, 15000);
-                    }
-                };
-                handler.postDelayed(runnable, 0);
-            }
-        });
-        threadUpdatePosition.start();
-        */
+
 
         handler.postDelayed( runnable = new Runnable() {
             public void run() {
