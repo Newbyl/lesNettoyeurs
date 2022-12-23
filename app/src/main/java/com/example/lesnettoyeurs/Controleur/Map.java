@@ -207,8 +207,9 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     });
                 }
                 else{
-                    miseEnModeVoyage(v);
                     updatePosition();
+                    miseEnModeVoyage(v);
+
                     imageButton.setBackgroundColor(0x00000000);
                     imageButton.setImageResource(R.drawable.clock);
                     imageButton.setEnabled(false);
