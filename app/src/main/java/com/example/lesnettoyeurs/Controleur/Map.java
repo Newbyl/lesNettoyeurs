@@ -1065,8 +1065,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
     private void updateTableau(){
          TextView tableau = (TextView) findViewById(R.id.tableauStats);
          tableau.setText(statsSolo+" \n"+statsEquipe);
-         tableau.setTextColor(0xFF000000);
-         tableau.setBackgroundColor(0x88000000);
+         //tableau.setTextColor(0xFF000000);
+         //tableau.setBackgroundColor(0x88000000);
     }
 
 
