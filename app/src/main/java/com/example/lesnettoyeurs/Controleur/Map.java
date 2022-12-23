@@ -92,6 +92,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
     private String statsEquipe;
     private String statsSolo;
     private String provider;
+    private Boolean stopMap=false;
 
 
     ArrayList<Cible> listeCibles = new ArrayList<Cible>();
@@ -185,82 +186,80 @@ public class Map extends AppCompatActivity implements LocationListener  {
             }
         }
 
-        this.updateNettoyeur();
-        // Afficher toutes les cibles
-        this.updatePosition();
+        if (!stopMap){//permet de cut le reste de la fonction si on est mort
+            this.updateNettoyeur();
+            // Afficher toutes les cibles
+            this.updatePosition();
 
-        ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
+            ImageButton imageButton = (ImageButton) findViewById(R.id.BoutonVoyage);
 
 
-        if (nettoyeur.getStatus().equals("VOY")){
-            imageButton.setBackgroundColor(0x88888888);
-            imageButton.setImageResource(R.drawable.atterissage);
-        }
-        else{
-            imageButton.setBackgroundColor(0x88888888);
-            imageButton.setImageResource(R.drawable.decollage);
-        }
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateNettoyeur();
-                if (nettoyeur.getStatus().equals("VOY")){
-                    remiseEnJeu(v);
-                    imageButton.setImageResource(R.drawable.decollage);
-                }
-                else if  (nettoyeur.getStatus().equals("PACK")){
-                    Context context = getApplicationContext();
-                    Log.d("KO", "Creation Nettoyeur KO");
-
-                    int duration = Toast.LENGTH_SHORT;
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            CharSequence text = "Vous êtes en préparation pour voyager !";
-                            Toast toast = Toast.makeText(context, text, duration);
-                            toast.show();
-                        }
-                    });
-                }
-                else{
-                    updatePosition();
-                    miseEnModeVoyage(v);
-
-                    imageButton.setBackgroundColor(0x00000000);
-                    imageButton.setImageResource(R.drawable.clock);
-                    imageButton.setEnabled(false);
-                    new Handler().postDelayed(new Runnable() {// Ajout d'un délai et une image sur le bouton de mise en voyage afin de savoir quand on est en train de se préparer
-                        @Override
-                        public void run() {
-                            imageButton.setBackgroundColor(0x88888888);
-                            imageButton.setImageResource(R.drawable.atterissage);
-                            imageButton.setEnabled(true);
-                        }
-                    },60000);
-                }
+            if (nettoyeur.getStatus().equals("VOY")) {
+                imageButton.setBackgroundColor(0x88888888);
+                imageButton.setImageResource(R.drawable.atterissage);
+            } else {
+                imageButton.setBackgroundColor(0x88888888);
+                imageButton.setImageResource(R.drawable.decollage);
             }
-        });
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    updateNettoyeur();
+                    if (nettoyeur.getStatus().equals("VOY")) {
+                        remiseEnJeu(v);
+                        imageButton.setImageResource(R.drawable.decollage);
+                    } else if (nettoyeur.getStatus().equals("PACK")) {
+                        Context context = getApplicationContext();
+                        Log.d("KO", " Nettoyeur PACK");
+                        int duration = Toast.LENGTH_SHORT;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                CharSequence text = "Vous êtes en préparation pour voyager !";
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+                        });
+                    } else {
+                        updatePosition();
+                        miseEnModeVoyage(v);
+
+                        imageButton.setBackgroundColor(0x00000000);
+                        imageButton.setImageResource(R.drawable.clock);
+                        imageButton.setEnabled(false);
+                        new Handler().postDelayed(new Runnable() {// Ajout d'un délai et une image sur le bouton de mise en voyage afin de savoir quand on est en train de se préparer
+                            @Override
+                            public void run() {
+                                imageButton.setBackgroundColor(0x88888888);
+                                imageButton.setImageResource(R.drawable.atterissage);
+                                imageButton.setEnabled(true);
+                            }
+                        }, 60000);
+                    }
+                }
+            });
 
 
-        handler.postDelayed( runnable = new Runnable() {
-            public void run() {
-                updateStats();
-                updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
-                if (nettoyeur.getStatus().equals("DEAD")){
-                    Context context = getApplicationContext();
-                    Log.d("KO", "Mort nettoyeur");
-                    int duration = Toast.LENGTH_SHORT;
-                    CharSequence text = "Vous êtes mort!";
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                    creationNettoyeur();
+            handler.postDelayed(runnable = new Runnable() {
+                public void run() {
+                    updateStats();
+                    updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
+                    if (nettoyeur.getStatus().equals("DEAD")) {
+                        Context context = getApplicationContext();
+                        Log.d("KO", "Mort nettoyeur");
+                        int duration = Toast.LENGTH_SHORT;
+                        CharSequence text = "Vous êtes mort!";
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                        creationNettoyeur();
+                    }
+                    if (!(nettoyeur.getStatus().equals("VOY") || nettoyeur.getStatus().equals("PACK"))) {
+                        updatePosition();
+                    }
+                    updateTableau();
+                    handler.postDelayed(runnable, delay);
                 }
-                if (!(nettoyeur.getStatus().equals("VOY")|| nettoyeur.getStatus().equals("PACK") )){
-                    updatePosition();
-                }
-                updateTableau();
-                handler.postDelayed(runnable, delay);
-            }
-        }, 0);
+            }, 0);
+        }
 
 
 
@@ -357,7 +356,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                     String teststatus = nodeStatus.getTextContent();
                     Context context = getApplicationContext();
                     int duration = Toast.LENGTH_SHORT;
-                    Log.d("KO", "Creation Nettoyeur KO");
+
                     if (teststatus.equals("OK")) {
                         NodeList Node1 = doc.getElementsByTagName("PARAMS");
                         String nom = Node1.item(0) .  getChildNodes().item(0).getTextContent();
@@ -369,9 +368,11 @@ public class Map extends AppCompatActivity implements LocationListener  {
                                 toast.show();
                             }
                         });
+                        stopMap=false;
                         nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
                     }
                     else if ( teststatus.equals("KO - NOT IN 3IA")){
+                        Log.d("KO", "Creation Nettoyeur 3IA");
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 CharSequence text = "Placez-vous en 3IA afin de créer votre Nettoyeur !";
@@ -380,6 +381,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
 
                             }
                         });
+                        stopMap=true;
                         finish();
 
                     }
@@ -402,6 +404,7 @@ public class Map extends AppCompatActivity implements LocationListener  {
                             String nom = Node1_.item(0).getChildNodes().item(0).getTextContent();
                             Log.d("NOM :", nom);
                             nettoyeur =new Nettoyeur(joueur.getSignature(), nom);
+                            stopMap=false;
                         }
                     }
 
