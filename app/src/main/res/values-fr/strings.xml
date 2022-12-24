@@ -7,5 +7,9 @@
     <string name="erreurmdp">Le mot de passe est vide</string>
     <string name="erreurlogin">pseudo oublié</string>
     <string name="erreurconnexion">Pseudo ou mot de passe de faux</string>
+    <string name="erreurenvoiemessage">Erreur dans l\'envoie du message</string>
+    <string name="erreurmessagevide">Votre message est vide</string>
+    <string name="message">Message...</string>
+    <string name="discussion">Discussion</string>
 
 </resources>

@@ -10,4 +10,14 @@
     <string name="title_activity_maps" translatable="false">MapsActivity</string>
     <string name="erreurlogin">pseudo oublié</string>
     <string name="erreurconnexion">Pseudo ou mot de passe faux</string>
+    <string name="hello_amit_anand_how_are_you">Hello Amit Anand, How are you?</string>
+    <string name="_10_25_pm">10:25 PM</string>
+    <string name="textview">TextView</string>
+    <string name="ceci_est_un_test">Ceci est un test</string>
+    <string name="erreurenvoiemessage">Erreur dans l\'envoie du message</string>
+    <string name="erreurmessagevide">Votre message est vide</string>
+    <string name="message">Message...</string>
+    <string name="todo1">TODO</string>
+    <string name="discussion">Discussion</string>
+    <string name="todo5">TODO</string>
 </resources>

@@ -4,6 +4,7 @@ public class Joueur {
 
     String signature;
     String session;
+    String pseudo;
 
     public Joueur(String session, String signature) {
         this.signature = signature;
@@ -24,5 +25,14 @@ public class Joueur {
 
     public void setSession(String session) {
         this.session = session;
+    }
+
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
+    }
+
+    public String getPseudo() {
+        return pseudo;
     }
 }

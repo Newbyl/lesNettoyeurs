@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Controleur.Map">
 
+
     <TextView
         android:id="@+id/tableauStats"
         android:layout_width="370dp"
@@ -25,6 +26,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/tchat"
+        android:layout_width="65dp"
+        android:layout_height="59dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="270dp"
+        android:elevation="1dp"
+
+
+
+        app:srcCompat="@drawable/messager" />
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
@@ -51,8 +67,8 @@
 
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/btn_star_big_on"
+        tools:ignore="SpeakableTextPresentCheck"
         tools:srcCompat="@drawable/atterissage" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

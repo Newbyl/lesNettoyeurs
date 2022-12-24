@@ -71,6 +71,7 @@ public class PageConnexion extends AppCompatActivity {
                         Intent intent= new Intent(PageConnexion.this, Map.class);
                         intent.putExtra("joueur_signature",joueur.getSignature());
                         intent.putExtra("joueur_session",joueur.getSession());
+                        intent.putExtra("joueur-pseudo",login.getText().toString());
                         startActivity(intent);
                     }
                     else {
@@ -166,6 +167,7 @@ public class PageConnexion extends AppCompatActivity {
                             String session = Node1.item(0).getChildNodes().item(0).getTextContent();
                             String signature = Node1.item(0).getChildNodes().item(1).getTextContent();
                             joueur=new Joueur(session,signature);
+
                     }
 
 

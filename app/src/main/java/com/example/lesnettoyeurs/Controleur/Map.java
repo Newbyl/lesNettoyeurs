@@ -17,6 +17,7 @@ import com.example.lesnettoyeurs.R;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,16 +30,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +52,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
 
@@ -62,7 +60,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -118,6 +115,8 @@ public class Map extends AppCompatActivity implements LocationListener  {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             joueur = new Joueur(extras.getString("joueur_session"),extras.getString("joueur_signature"));
+            joueur.setPseudo(extras.getString("joueur-pseudo"));
+
         }
 
         //Creation map
@@ -264,6 +263,21 @@ public class Map extends AppCompatActivity implements LocationListener  {
             finish();
             return;
         }
+
+        //
+        ImageView tchat=  findViewById(R.id.tchat);
+        tchat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2= new Intent(Map.this, Tchat2.class);
+                intent2.putExtra("joueur_signature",joueur.getSignature());
+                intent2.putExtra("joueur_session",joueur.getSession());
+                intent2.putExtra(  "joueur-pseudo",joueur.getPseudo());
+                startActivity(intent2);
+            }
+        });
+
+
 
 
     }
