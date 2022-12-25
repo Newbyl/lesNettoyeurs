@@ -1086,20 +1086,20 @@ public class Map extends Fragment implements LocationListener  {
          TextView pointsequipe=requireActivity().findViewById(R.id.Pointsequipe);
          TextView pointsadverse=requireActivity().findViewById(R.id.Pointsadverse);
          name.setText(statsSolo.get(0));
-         points.setText(statsSolo.get(2) + " points");
+         points.setText("Vos Points: "+statsSolo.get(2) + " points");
          if(statsSolo.get(1).equals("UP")){
-             status.setText("Vous êtes ACTIF");
+             status.setText("Vous êtes en mode ACTIF");
          }
          else if (statsSolo.get(1).equals("PACK")){
-             status.setText("Vous preparez le voyager");
+             status.setText("Vous êtes en mode PREPARER LE VOYAGE");
          }
          else if (statsSolo.get(1).equals("VOY")){
-             status.setText("Vous êtes en VOYAGE");
+             status.setText("Vous êtes en mode VOYAGE");
          }
          else if (statsSolo.get(1).equals("NEF")){
-             status.setText("Vous êtes entrain de ESSUYER LES SALETE");
+             status.setText("Vous êtes en mode dESSUYER LES SALETEES");
          }
-         joueurenligne.setText("Il y a " +statsEquipe.get(2)+ " joueurs" );
+         joueurenligne.setText("Il y a " +statsEquipe.get(2)+ " joueurs en ligne actuellement" );
          pointsequipe.setText("Mon equipe a "+ statsEquipe.get(0) +" points");
          pointsadverse.setText("L'equipe adverse a "+statsEquipe.get(1)+ " points");
 

@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
@@ -31,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
          drawerLayout=findViewById(R.id.drawer);
 
-        replaceFragment(new Map());
+       replaceFragment(new Map());
+
+
     }
 
     public  void ClickMenu(View view){
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void ClickMap(View view){
+        FrameLayout  frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
+        frameLayout.removeAllViews();
         replaceFragment(new Map());
     }
 

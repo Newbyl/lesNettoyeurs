@@ -25,7 +25,7 @@
 
         <TextView
             android:id="@+id/textView2"
-            android:layout_width="308dp"
+            android:layout_width="match_parent"
             android:layout_height="49dp"
             android:layout_weight="1"
             android:text="Les Nettoyeurs"
@@ -34,10 +34,11 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="310dp"
+            android:layout_width="match_parent"
             android:layout_height="49dp"
             android:layout_weight="1"
             app:srcCompat="@drawable/letter_n" />
+
     </LinearLayout>
 
 
