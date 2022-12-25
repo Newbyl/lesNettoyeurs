@@ -9,6 +9,92 @@
 
 
         <TextView
+            android:id="@+id/TexteTuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tuto2"
+            android:elevation="1dp"
+            android:text="TextView"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/map"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/flechehaut2"
+            android:layout_width="73dp"
+            android:layout_height="67dp"
+            android:src="@drawable/ic_baseline_arrow_upward_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/Pointsadverse"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.06"
+            android:elevation="1dp"
+
+            />
+
+
+        <ImageView
+            android:id="@+id/flechehaut1"
+            android:layout_width="73dp"
+            android:layout_height="67dp"
+            android:src="@drawable/ic_baseline_arrow_upward_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/Pointsadverse"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintVertical_bias="0.06"
+            android:elevation="1dp"
+            />
+
+        <ImageView
+            android:id="@+id/flechebas"
+            android:layout_width="73dp"
+            android:layout_height="67dp"
+            android:src="@drawable/ic_baseline_arrow_downward_24"
+            app:layout_constraintBottom_toBottomOf="@+id/map"
+            app:layout_constraintEnd_toEndOf="@+id/Pointsadverse"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.89"
+            app:layout_constraintHorizontal_bias="1.0"
+            android:elevation="1dp"
+            />
+
+        <ImageView
+            android:id="@+id/flechegauche"
+            android:layout_width="67dp"
+            android:layout_height="73dp"
+            android:elevation="1dp"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            app:layout_constraintBottom_toBottomOf="@+id/map"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.20"
+            app:layout_constraintHorizontal_bias="0.02"/>
+
+
+        <Button
+            android:id="@+id/buttontuto"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:elevation="1dp"
+            android:background="@drawable/btn_connexion"
+            android:text="@string/commencez_le_tuto"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.85" />
+
+        <TextView
             android:id="@+id/Pointsadverse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

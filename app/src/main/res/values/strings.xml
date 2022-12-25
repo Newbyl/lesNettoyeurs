@@ -55,6 +55,30 @@
     <string name="Navbar7">Mon equipe a </string>
     <string name="Navbar8"> points</string>
     <string name="Navbar9">L\'equipe adverse a </string>
+    <string name="Vospoints">"Vos Points: "</string>
+    <string name="commencez_le_tuto">Commencez le Tuto</string>
+    <string name="button1Tuto">C\'est parti !!</string>
+    <string name="butontuto2">On continue</string>
+    <string name="butonTuto3">C\'est pas fini</string>
+    <string name="ButtonTuTo4">Presque la fin</string>
+    <string name="TextTuto1">\"Bonjour et Bienvenue dans Les Nettoyeurs.\n Etes vous prêt à comprendre ce jeu amusant \"</string>
+    <string name="TextTuto2">Le but du jeu est de Nettoyer les cibles  et aussi les agents ennemis en equipe.\n</string>
+    <string name="TextTuto3">Ils sont indiqués sur la map pour la cible c\'est une cible et les agents c\'est un homme vetu de gris.\n</string>
+    <string name="TextTuto4">Lorsque  vous nettoyerez, vous pouvez vous faire detecter par les adversaires de l\'autre equipe. \n</string>
+    <string name="TextTuto5">Pour connaitre la valeur des points des cibles et les ennemies , restez appuyer sur la cible ou l\'ennemie</string>
+    <string name="TextTuto6">Il y a differents modes de deplacement lorsque vous cliquerez là où indique la flèche l\'image va changer. \n</string>
+    <string name="TextTuto7">Lorsque l\'avion Monte vous êtes en deplacement ACTIF et donc vous pouvez nettoyer les cibles et joueurs mais votre vitesse est limité \n</string>
+    <string name="TextTuto8">Lorsque l\'avion descend vous êtes en VOYAGE, vous n\'avez pas de limite de vitesse mais vous pouvez rien nettoyer.\n</string>
+    <string name="TextTuto9">Entre ces 2 modes, il y a le mode preparation Voyage, vous devez restez immobile pendant 1 minutes, une horloge apparaitra.\n</string>
+    <string name="TextTuto10">Pour terminer, si vous êtes nettoyé, vous êtes mort et donc vous devez rejoindre le Batiment 3IA pour rejouer</string>
+    <string name="TextTuto11">La flèche vous indique  la navigation où vous pouvez trouver vos points personnels, le nombre de joueur en ligne\n et le Tchat pour communiquer avec votre equipe</string>
+    <string name="TextTuto12">Les flèches vous indiquent les points de votre equipes et ceux de l\'equipe adverse.\n</string>
+    <string name="TextTuto13">Je vous souhaite Bonne chance dans cette aventure</string>
+    <string name="ButtonTuto5">Fin</string>
+    <string name="Quitter">Quitter</string>
+    <string name="ConfimationQuittez">Voulez vous quittez le jeu</string>
+    <string name="Oui">Oui</string>
+    <string name="Non">Non</string>
 
 
 </resources>

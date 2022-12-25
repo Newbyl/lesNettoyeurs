@@ -7,6 +7,7 @@ import static android.content.ContentValues.TAG;
 import static java.lang.Float.parseFloat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -42,6 +43,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -96,7 +98,21 @@ public class Map extends Fragment implements LocationListener  {
     private  ArrayList<String> statsSolo;
     private String provider;
     private Boolean stopMap=false;
+    private int Tuto=-1;
+    private  int Tuto1=-1;
     View view;
+    private int defaultValue=0;
+
+
+   private Button buttontuto;
+   private ImageView flechehaut1;
+    private ImageView flechehaut2;
+    private ImageView flechebas;
+    private ImageView flechegauche;
+    private  TextView TexteTuto;
+
+
+
 
 
     ArrayList<Cible> listeCibles = new ArrayList<Cible>();
@@ -116,8 +132,28 @@ public class Map extends Fragment implements LocationListener  {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = inflater.inflate(R.layout.activity_map, container, false);
+        this.invisible_boutons();
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+             Tuto = bundle.getInt("1", defaultValue);
+        }
+
+        if(Tuto==0){
+            Tuto1=1;
+            this.Tuto();
+            Tuto1++;
+        }
 
         Configuration.getInstance().load(requireActivity(), PreferenceManager.getDefaultSharedPreferences(getActivity()));
+
+        buttontuto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Tuto();
+                Tuto1++;
+            }
+        });
+
 
 
         Universite information = new Universite();
@@ -271,10 +307,23 @@ public class Map extends Fragment implements LocationListener  {
                 }
             }, 0);
         } else {
-            getActivity().finish();
+            Intent intent = new Intent(requireActivity(), PageConnexion.class);
+            startActivity(intent);
+            requireActivity().finish();
+
         }
+
+
+
+
+
         return view;
     }
+
+
+
+
+
 
 
 
@@ -378,6 +427,7 @@ public class Map extends Fragment implements LocationListener  {
                         Log.d("OK", "Creation Nettoyeur OK");
                        requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
+                                int duration = Toast.LENGTH_SHORT;
                                 CharSequence text = getString(R.string.Bienvenue)+nom+getString(R.string.danslejeudesNettoyeurs);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
@@ -390,6 +440,7 @@ public class Map extends Fragment implements LocationListener  {
                         Log.d("KO", "Creation Nettoyeur 3IA");
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
+                                int duration = Toast.LENGTH_LONG;
                                 CharSequence text = getString(R.string.Placeren3IA);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
@@ -1076,10 +1127,12 @@ public class Map extends Fragment implements LocationListener  {
 
     }
 
+    @Nullable
+    public View getView1() {
+        return view;
+    }
 
-
-
-   ////Tableau
+////Tableau
 
     private void updateNavBaretPoints(){
          TextView name=requireActivity().findViewById(R.id.name);
@@ -1089,7 +1142,7 @@ public class Map extends Fragment implements LocationListener  {
          TextView pointsequipe=requireActivity().findViewById(R.id.Pointsequipe);
          TextView pointsadverse=requireActivity().findViewById(R.id.Pointsadverse);
          name.setText(statsSolo.get(0));
-         points.setText("Vos Points: "+statsSolo.get(2) + " points");
+         points.setText(getString(R.string.Vospoints)+statsSolo.get(2) + getString(R.string.Navbar8));
          if(statsSolo.get(1).equals("UP")){
              status.setText(R.string.Navbar1);
          }
@@ -1105,6 +1158,9 @@ public class Map extends Fragment implements LocationListener  {
          joueurenligne.setText(getString(R.string.Navbar6) +statsEquipe.get(2)+ getString(R.string.Navbar5) );
          pointsequipe.setText(getString(R.string.Navbar7)+ statsEquipe.get(0) +getString(R.string.Navbar8));
          pointsadverse.setText(getString(R.string.Navbar9)+statsEquipe.get(1)+getString(R.string.Navbar8) );
+
+
+
 
     }
 
@@ -1141,4 +1197,85 @@ public class Map extends Fragment implements LocationListener  {
     public void onProviderDisabled(@NonNull String provider) {
         LocationListener.super.onProviderDisabled(provider);
     }
+
+
+
+private void invisible_boutons(){
+     buttontuto=view.findViewById(R.id.buttontuto);
+     flechehaut1=view.findViewById(R.id.flechehaut1);
+     flechehaut2=view.findViewById(R.id.flechehaut2);
+     flechebas=view.findViewById(R.id.flechebas);
+     flechegauche=view.findViewById(R.id.flechegauche);
+     TexteTuto=view.findViewById(R.id.TexteTuto);
+
+
+     buttontuto.setVisibility(View.GONE);
+     flechehaut1.setVisibility(View.GONE);
+     flechehaut2.setVisibility(View.GONE);
+     flechebas.setVisibility(View.GONE);
+     flechegauche.setVisibility(View.GONE);
+     TexteTuto.setVisibility(View.GONE);
+
+
+}
+
+private void Tuto(){
+
+        if(Tuto1==1) {
+            TexteTuto.setVisibility(View.VISIBLE);
+            buttontuto.setVisibility(View.VISIBLE);
+            TexteTuto.setText(R.string.TextTuto1);
+            buttontuto.setText(R.string.button1Tuto);
+        }
+        else if (Tuto1==2){
+            TexteTuto.setText(getString(R.string.TextTuto2) +
+                    getString(R.string.TextTuto3) +
+                    getString(R.string.TextTuto4)+
+                    getString(R.string.TextTuto5));
+            buttontuto.setText(R.string.butontuto2);
+
+        }
+        else if (Tuto1==3){
+            flechebas.setVisibility(View.VISIBLE);
+            TexteTuto.setText(getString(R.string.TextTuto6) +
+                    getString(R.string.TextTuto7) +
+                    getString(R.string.TextTuto8) +
+                    getString(R.string.TextTuto9) +
+                    getString(R.string.TextTuto10));
+
+            buttontuto.setText(R.string.butonTuto3);
+
+        }
+
+        else if (Tuto1==4){
+            flechebas.setVisibility(View.GONE);
+            flechegauche.setVisibility(View.VISIBLE);
+            TexteTuto.setText(R.string.TextTuto11);
+            buttontuto.setText(R.string.ButtonTuTo4);
+
+        }
+        else if (Tuto1==5){
+            flechegauche.setVisibility(View.GONE);
+            flechehaut1.setVisibility(View.VISIBLE);
+            flechehaut2.setVisibility(View.VISIBLE);
+            TexteTuto.setText(getString(R.string.TextTuto12) +
+                    getString(R.string.TextTuto13));
+
+            buttontuto.setText(R.string.ButtonTuto5);
+
+        }
+        else {
+            buttontuto.setVisibility(View.GONE);
+            flechehaut1.setVisibility(View.GONE);
+            flechehaut2.setVisibility(View.GONE);
+            TexteTuto.setVisibility(View.GONE);
+
+            Tuto=0;
+        }
+
+}
+
+
+
+
 }

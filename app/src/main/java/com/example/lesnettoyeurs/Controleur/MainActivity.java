@@ -1,6 +1,7 @@
 package com.example.lesnettoyeurs.Controleur;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -15,15 +16,21 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.example.lesnettoyeurs.R;
 
 public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     ImageView profil;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
          drawerLayout=findViewById(R.id.drawer);
 
-       replaceFragment(new Map());
+         replaceFragment(new Map());
+
 
 
     }
@@ -61,16 +69,16 @@ public class MainActivity extends AppCompatActivity {
 
     public static void logout(Activity activity) {
         AlertDialog.Builder builder=new AlertDialog.Builder(activity);
-        builder.setTitle("Quitter");
-        builder.setMessage("Voulez vous quittez le jeu");
-        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.Quitter);
+        builder.setMessage(R.string.ConfimationQuittez);
+        builder.setPositiveButton(R.string.Oui, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 activity.finishAffinity();
                 System.exit(0);
             }
         });
-        builder.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.Non, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
@@ -90,6 +98,21 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new Map());
     }
 
+    public void ClickTuto(View view){
+        Fragment map=new Map();
+        Bundle bundle = new Bundle();
+        bundle.putInt("1", 0);
+        map.setArguments(bundle);
+        replaceFragment(map);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+
+        }
+
+    }
+
+
+
 
     //
     public  void clickTchat(View view){
@@ -97,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.frameLayout, new Tchat2());
         fragmentTransaction.commit();
+
+
         }
 
 
@@ -108,9 +133,6 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.commit();
 
     }
-
-
-
 
 
 

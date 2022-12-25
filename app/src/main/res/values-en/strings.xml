@@ -9,5 +9,10 @@
     <string name="erreurconnexion">Pseudo ou mot de passe de faux</string>
     <string name="map">Map</string>
     <string name="tchat">Tchat</string>
+    <string name="Oui">Yes</string>
+    <string name="Non">No</string>
+    <string name="Quitter">Logout</string>
+    <string name="ButtonTuto5">End</string>
+    <string name="ConfimationQuittez">Are you sure you want to logout?</string>
 
 </resources>
