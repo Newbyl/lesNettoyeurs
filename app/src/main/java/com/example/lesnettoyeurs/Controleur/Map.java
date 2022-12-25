@@ -250,7 +250,8 @@ public class Map extends Fragment implements LocationListener  {
             handler.postDelayed(runnable = new Runnable() {
                 public void run() {
                     updateStats();
-                    updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
+                    if (isAdded())
+                        updateNettoyeur();// Ajout d'un check sur le status du nettoyeur afin de savoir s'il est mort. Si oui on tente d'en refaire un
                     if (nettoyeur.getStatus().equals("DEAD")) {
                         Context context = requireActivity().getApplicationContext();
                         Log.d("KO", "Mort nettoyeur");
@@ -261,9 +262,11 @@ public class Map extends Fragment implements LocationListener  {
                         creationNettoyeur();
                     }
                     if (!(nettoyeur.getStatus().equals("VOY") || nettoyeur.getStatus().equals("PACK"))) {
-                        updatePosition();
+                        if (isAdded())
+                            updatePosition();
                     }
-                    updateNavBaretPoints();
+                    if (isAdded())
+                        updateNavBaretPoints();
                     handler.postDelayed(runnable, delay);
                 }
             }, 0);

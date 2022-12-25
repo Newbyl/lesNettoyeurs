@@ -121,8 +121,4 @@ public class WebServiceLastMSG
         return new Message(contenu, strDate, type,auteur );
     }
 
-
-
-
-
 }
