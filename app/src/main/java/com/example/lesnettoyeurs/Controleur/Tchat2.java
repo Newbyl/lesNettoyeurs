@@ -3,12 +3,16 @@ package com.example.lesnettoyeurs.Controleur;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Tchat2 extends AppCompatActivity {
+public class Tchat2 extends Fragment {
 
 
     List<Message> messageChatModelList =  new ArrayList<>();
@@ -33,12 +37,20 @@ public class Tchat2 extends AppCompatActivity {
     EditText messageET;
     ImageView sendBtn;
 
+    DrawerLayout drawerLayout;
+
+    View view;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.page_tchat, container, false);
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.page_tchat);
-        Bundle extras = getIntent().getExtras();
-        ImageView back = findViewById(R.id.retour);
+
+
+        Bundle extras = getActivity().getIntent().getExtras();
         if (extras != null) {
             joueur = new Joueur(extras.getString("joueur_session"),extras.getString("joueur_signature"));
             joueur.setPseudo(extras.getString("joueur-pseudo"));
@@ -47,35 +59,35 @@ public class Tchat2 extends AppCompatActivity {
 
 
 
-        messageET = (EditText)findViewById(R.id.messageET);
-        sendBtn = (ImageView) findViewById(R.id.sendBtn);
+        messageET = (EditText)view.findViewById(R.id.messageET);
+        sendBtn = (ImageView)view.findViewById(R.id.sendBtn);
 
-        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
-        LinearLayoutManager manager = new LinearLayoutManager(Tchat2.this, RecyclerView.VERTICAL, false);
+        recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
+        LinearLayoutManager manager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         manager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(manager);
 
 
         recyclerView.smoothScrollToPosition(messageChatModelList.size());
-        adapter = new MessageChatAdapter(messageChatModelList, Tchat2.this );
+        adapter = new MessageChatAdapter(messageChatModelList, getContext() );
         recyclerView.setAdapter(adapter);
 
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = getApplicationContext();
+                Context context = getContext();
                 String msg = messageET.getText().toString();
                 if(msg.length()!=0) {
                     new Thread(() -> {
                         WebServiceNewMSG ws = new WebServiceNewMSG(joueur.getPseudo(), msg, joueur);
                         boolean ok = ws.call();
                         if (!ok)
-                            runOnUiThread(() -> Toast.makeText(context, getResources().getString(R.string.erreurenvoiemessage), Toast.LENGTH_LONG).show());
+                            requireActivity().runOnUiThread(() -> Toast.makeText(context, getResources().getString(R.string.erreurenvoiemessage), Toast.LENGTH_LONG).show());
 
                         else {
-                            runOnUiThread(() ->
+                            requireActivity().runOnUiThread(() ->
                                     {
                                         raffaichirMessages();
                                     }
@@ -93,17 +105,10 @@ public class Tchat2 extends AppCompatActivity {
             }
         });
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent2= new Intent(Tchat2.this, Map.class);
-                startActivity(intent2);
-                finish();
-            }
-        });
 
 
 
+    return  view;
     }
 
 
@@ -122,7 +127,7 @@ public class Tchat2 extends AppCompatActivity {
             WebServiceLastMSG ws = new WebServiceLastMSG(joueur);
             ArrayList<Message> aAjouter = ws.call();
             try {
-                runOnUiThread(() -> {
+                getActivity().runOnUiThread(() -> {
                     this.deleteMessages();
                     for (Message m : aAjouter)
                     {
@@ -130,7 +135,7 @@ public class Tchat2 extends AppCompatActivity {
                     }
 
                     recyclerView.smoothScrollToPosition(messageChatModelList.size());
-                    adapter = new MessageChatAdapter(messageChatModelList, Tchat2.this );
+                    adapter = new MessageChatAdapter(messageChatModelList, getContext() );
                     recyclerView.setAdapter(adapter);
 
 
@@ -147,36 +152,12 @@ public class Tchat2 extends AppCompatActivity {
 
 
     private void deleteMessages(){
-        for (int i=0; i<messageChatModelList.size();i++){
-            messageChatModelList.remove(i);
+        if(messageChatModelList.size()>0) {
+            for (int i = 0; i < messageChatModelList.size(); i++) {
+                messageChatModelList.remove(i);
+            }
         }
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

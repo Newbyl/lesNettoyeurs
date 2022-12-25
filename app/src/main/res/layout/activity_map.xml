@@ -4,71 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/drawer"
     tools:context=".Controleur.Map">
 
 
-    <TextView
-        android:id="@+id/tableauStats"
-        android:layout_width="370dp"
-        android:layout_height="110dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="5dp"
-        android:textStyle="bold"
-        android:background="@drawable/rounded_corner"
+        <TextView
+            android:id="@+id/Pointsadverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/rounded_corner"
+            android:elevation="1dp"
+            android:text="Pointsadverse"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
+        <TextView
+            android:id="@+id/Pointsequipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
 
-        android:layout_marginBottom="-200dp"
-        android:elevation="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/map"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/tchat"
-        android:layout_width="65dp"
-        android:layout_height="59dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="270dp"
-        android:elevation="1dp"
+            android:background="@drawable/rounded_corner"
+            android:elevation="1dp"
+            android:text="Pointsequipe"
 
 
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        app:srcCompat="@drawable/messager" />
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
 
-        android:elevation="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/BoutonVoyage"
-        app:layout_constraintStart_toStartOf="parent">
 
-    </org.osmdroid.views.MapView>
+        <ImageButton
+            android:id="@+id/BoutonVoyage"
+            android:layout_width="62dp"
+            android:layout_height="59dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
 
-    <ImageButton
-        android:id="@+id/BoutonVoyage"
-        android:layout_width="62dp"
-        android:layout_height="59dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:elevation="1dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+            android:elevation="1dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@android:drawable/btn_star_big_on"
+            tools:ignore="SpeakableTextPresentCheck"
+            tools:srcCompat="@drawable/atterissage" />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/btn_star_big_on"
-        tools:ignore="SpeakableTextPresentCheck"
-        tools:srcCompat="@drawable/atterissage" />
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:elevation="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </org.osmdroid.views.MapView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

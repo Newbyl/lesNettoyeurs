@@ -68,11 +68,12 @@ public class PageConnexion extends AppCompatActivity {
                 }
                 else{
                      if (PageConnexion.this.Connexion(login.getText().toString(),password.getText().toString())!= null ){
-                        Intent intent= new Intent(PageConnexion.this, Map.class);
+                        Intent intent= new Intent(PageConnexion.this, MainActivity.class);
                         intent.putExtra("joueur_signature",joueur.getSignature());
                         intent.putExtra("joueur_session",joueur.getSession());
                         intent.putExtra("joueur-pseudo",login.getText().toString());
                         startActivity(intent);
+                        finish();
                     }
                     else {
                       message_erreur.setText(getResources().getString(R.string.erreurconnexion));

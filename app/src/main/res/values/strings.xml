@@ -20,4 +20,9 @@
     <string name="todo1">TODO</string>
     <string name="discussion">Discussion</string>
     <string name="todo5">TODO</string>
+    <string name="map">Map</string>
+    <string name="tchat">Tchat</string>
+    <string name="quitter">Quitter</string>
+    <string name="homme">Homme</string>
+    <string name="femme">Femme</string>
 </resources>

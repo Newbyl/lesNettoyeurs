@@ -7,5 +7,7 @@
     <string name="erreurmdp">fff</string>
     <string name="erreurlogin">fff</string>
     <string name="erreurconnexion">Pseudo ou mot de passe de faux</string>
+    <string name="map">Map</string>
+    <string name="tchat">Tchat</string>
 
 </resources>
