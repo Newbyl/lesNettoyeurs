@@ -222,7 +222,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes en préparation pour voyager !";
+                                CharSequence text = getString(R.string.preparationvoyage);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -255,7 +255,7 @@ public class Map extends Fragment implements LocationListener  {
                         Context context = requireActivity().getApplicationContext();
                         Log.d("KO", "Mort nettoyeur");
                         int duration = Toast.LENGTH_SHORT;
-                        CharSequence text = "Vous êtes mort!";
+                        CharSequence text = getString(R.string.Mort);
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                         creationNettoyeur();
@@ -375,7 +375,7 @@ public class Map extends Fragment implements LocationListener  {
                         Log.d("OK", "Creation Nettoyeur OK");
                        requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Bienvenue "+nom+" dans le jeu des Nettoyeurs";
+                                CharSequence text = getString(R.string.Bienvenue)+nom+getString(R.string.danslejeudesNettoyeurs);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -387,7 +387,7 @@ public class Map extends Fragment implements LocationListener  {
                         Log.d("KO", "Creation Nettoyeur 3IA");
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Placez-vous en 3IA afin de créer votre Nettoyeur !";
+                                CharSequence text = getString(R.string.Placeren3IA);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
 
@@ -476,7 +476,7 @@ public class Map extends Fragment implements LocationListener  {
                         updateNettoyeur();
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes bien revenu en jeu, mais vous avez été détecté !";
+                                CharSequence text = getString(R.string.Vousetesrevenue);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -532,11 +532,11 @@ public class Map extends Fragment implements LocationListener  {
                             @Override
                             public void run() {
                                 Handler handler = new Handler();
-                                Toast.makeText(requireActivity().getApplicationContext(), "Veuillez rester immobile 1 minutes\n afin de passer en mode voyage", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireActivity().getApplicationContext(), R.string.attendre1minute, Toast.LENGTH_SHORT).show();
                                 handler.postDelayed(new Runnable() {
 
                                     final Context context = requireActivity().getApplicationContext();
-                                    final Toast toast = Toast.makeText(context, "Il reste 30 secondes", Toast.LENGTH_SHORT);
+                                    final Toast toast = Toast.makeText(context, R.string.trenteseconde, Toast.LENGTH_SHORT);
                                     @Override
                                     public void run() {
                                         toast.show();
@@ -544,7 +544,7 @@ public class Map extends Fragment implements LocationListener  {
                                 }, 30000);
                                 handler.postDelayed(new Runnable() {
                                     final Context context =requireActivity().getApplicationContext();
-                                    final Toast toast = Toast.makeText(context, "Il reste 15 secondes", Toast.LENGTH_SHORT);
+                                    final Toast toast = Toast.makeText(context, R.string.quinzeseconde, Toast.LENGTH_SHORT);
                                     @Override
                                     public void run() {
                                         toast.show();
@@ -552,8 +552,8 @@ public class Map extends Fragment implements LocationListener  {
                                 }, 45000);
                                 handler.postDelayed(new Runnable() {
                                     final Context context =requireActivity().getApplicationContext();
-                                    final Toast toast = Toast.makeText(context, "Vous êtes désormais en mode voyage" +
-                                                    "\n rappuyez sur l'avion afin de retourner en jeu"
+                                    final Toast toast = Toast.makeText(context, getString(R.string.EnmodeVoyage2) +
+                                                    getString(R.string.EnmodeVoyage)
                                             , Toast.LENGTH_SHORT);
                                     @Override
                                     public void run() {
@@ -706,12 +706,12 @@ public class Map extends Fragment implements LocationListener  {
                     for (int i=0;i<listeCibles.size();i++) {
                         OverlayItem cible;
                         if (listeCibles.get(i).getEstNettoyeur()) {
-                            cible = new OverlayItem("Nettoyeur ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
+                            cible = new OverlayItem(getString(R.string.Nettoyeurvaleur)+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
                             cible.setMarker(inspecteurDrawable);
                             itemNET.add(cible);
 
                         } else {
-                            cible = new OverlayItem("Cible ayant pour valeur : "+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
+                            cible = new OverlayItem(getString(R.string.CibleValeur)+listeCibles.get(i).getValue()+"", listeCibles.get(i).getId()+"", new GeoPoint(listeCibles.get(i).getLat(), listeCibles.get(i).getLon()));
                             cible.setMarker(cibleDrawable);
                             itemCTR.add(cible);
                         }
@@ -832,10 +832,10 @@ public class Map extends Fragment implements LocationListener  {
 
                         String text="";
                         if (outcome==1 ){
-                            text="Vous avez nettoyer le nettoyeur ennemi bien joué !";
+                            text=getString(R.string.Nettoyeunnettoyeur);
                         }
                         if (outcome==0 ){
-                            text="Vous n'avez pas réussi à nettoyer le nettoyeur ennemi, dommage ! ";
+                            text=getString(R.string.Echecnettoyagenettoyeur);
                         }
                         Context context = requireActivity().getApplicationContext();
                         Log.d("OK", "Tentative cible (NET)");
@@ -854,7 +854,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes en préparation pour le mode voyage, vous ne pouvez pas nettoyer";
+                                CharSequence text = getString(R.string.Pasnettoyerprepartionvoage);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -867,7 +867,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes en mode voyage, vous ne pouvez pas nettoyer";
+                                CharSequence text = getString(R.string.PasnettoyerModeVoyage);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -880,7 +880,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes trop loin pour nettoyer la cible !";
+                                CharSequence text = getString(R.string.LoinCible);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -936,16 +936,16 @@ public class Map extends Fragment implements LocationListener  {
                         int detected = Integer.parseInt(Node1.item(0).getChildNodes().item(1).getTextContent());
                         String text="";
                         if (outcome==1 && detected==0){
-                            text="Vous avez nettoyer la cible et n'avez pas été detecté !";
+                            text=getString(R.string.nettoyagecible1);
                         }
                         if (outcome==1 && detected==0){
-                            text="Vous avez nettoyer la cible, malheureusement vous avez été detecté ";
+                            text=getString(R.string.nettoyagecible2);
                         }
                         if (outcome==0 && detected==1){
-                            text="C'est une catastrophe, vous n'avez pas réussi à nettoyer la cible et avez été detecté ! ";
+                            text=getString(R.string.nettoyagecible3);
                         }
                         if (outcome==1 && detected==1){
-                            text="Vous avez été detecté et avez nettoyé la cible ";
+                            text=getString(R.string.nettoyagecible4);
                         }
                         Context context = requireActivity().getApplicationContext();
                         Log.d("OK", "Tentative cible (CTR)");
@@ -964,7 +964,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes en préparation pour le mode voyage, vous ne pouvez pas nettoyer";
+                                CharSequence text =getString(R.string.Pasnettoyerprepartionvoage);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -977,7 +977,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes en mode voyage , vous ne pouvez pas nettoyer";
+                                CharSequence text = getString(R.string.PasnettoyerModeVoyage);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -990,7 +990,7 @@ public class Map extends Fragment implements LocationListener  {
                         int duration = Toast.LENGTH_SHORT;
                         requireActivity().runOnUiThread(new Runnable() {
                             public void run() {
-                                CharSequence text = "Vous êtes trop loin pour nettoyer la cible !";
+                                CharSequence text = getString(R.string.LoinCible);
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
@@ -1088,20 +1088,20 @@ public class Map extends Fragment implements LocationListener  {
          name.setText(statsSolo.get(0));
          points.setText("Vos Points: "+statsSolo.get(2) + " points");
          if(statsSolo.get(1).equals("UP")){
-             status.setText("Vous êtes en mode ACTIF");
+             status.setText(R.string.Navbar1);
          }
          else if (statsSolo.get(1).equals("PACK")){
-             status.setText("Vous êtes en mode PREPARER LE VOYAGE");
+             status.setText(R.string.Navbar2);
          }
          else if (statsSolo.get(1).equals("VOY")){
-             status.setText("Vous êtes en mode VOYAGE");
+             status.setText(R.string.Navbar3);
          }
          else if (statsSolo.get(1).equals("NEF")){
-             status.setText("Vous êtes en mode dESSUYER LES SALETEES");
+             status.setText(R.string.Navbar4);
          }
-         joueurenligne.setText("Il y a " +statsEquipe.get(2)+ " joueurs en ligne actuellement" );
-         pointsequipe.setText("Mon equipe a "+ statsEquipe.get(0) +" points");
-         pointsadverse.setText("L'equipe adverse a "+statsEquipe.get(1)+ " points");
+         joueurenligne.setText(getString(R.string.Navbar6) +statsEquipe.get(2)+ getString(R.string.Navbar5) );
+         pointsequipe.setText(getString(R.string.Navbar7)+ statsEquipe.get(0) +getString(R.string.Navbar8));
+         pointsadverse.setText(getString(R.string.Navbar9)+statsEquipe.get(1)+getString(R.string.Navbar8) );
 
     }
 

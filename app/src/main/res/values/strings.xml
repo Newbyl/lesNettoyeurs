@@ -10,7 +10,6 @@
     <string name="title_activity_maps" translatable="false">MapsActivity</string>
     <string name="erreurlogin">pseudo oublié</string>
     <string name="erreurconnexion">Pseudo ou mot de passe faux</string>
-    <string name="hello_amit_anand_how_are_you">Hello Amit Anand, How are you?</string>
     <string name="_10_25_pm">10:25 PM</string>
     <string name="textview">TextView</string>
     <string name="ceci_est_un_test">Ceci est un test</string>
@@ -25,4 +24,37 @@
     <string name="quitter">Quitter</string>
     <string name="homme">Homme</string>
     <string name="femme">Femme</string>
+    <string name="preparationvoyage">Vous êtes en préparation pour voyager !</string>
+    <string name="Mort">Vous êtes mort!</string>
+    <string name="Bienvenue">Bienvenue </string>
+    <string name="danslejeudesNettoyeurs">  dans le jeu des Nettoyeurs</string>
+    <string name="Placeren3IA">Placez-vous en 3IA afin de créer votre Nettoyeur !</string>
+    <string name="Vousetesrevenue">Vous êtes bien revenu en jeu, mais vous avez été détecté !</string>
+    <string name="attendre1minute">Veuillez rester immobile 1 minutes\n afin de passer en mode voyage</string>
+    <string name="trenteseconde">Il reste 30 secondes</string>
+    <string name="quinzeseconde">Il reste 15 secondes</string>
+    <string name="EnmodeVoyage">\n rappuyez sur l\'avion afin de retourner en jeu</string>
+    <string name="EnmodeVoyage2">Vous êtes désormais en mode voyage</string>
+    <string name="Nettoyeurvaleur">Nettoyeur ayant pour valeur : </string>
+    <string name="CibleValeur">Cible ayant pour valeur : </string>
+    <string name="Nettoyeunnettoyeur">Vous avez nettoyer le nettoyeur ennemi bien joué !</string>
+    <string name="Echecnettoyagenettoyeur">Vous n\'avez pas réussi à nettoyer le nettoyeur ennemi, dommage ! </string>
+    <string name="Pasnettoyerprepartionvoage">Vous êtes en préparation pour le mode voyage, vous ne pouvez pas nettoyer</string>
+    <string name="PasnettoyerModeVoyage">Vous êtes en mode voyage, vous ne pouvez pas nettoyer</string>
+    <string name="LoinCible">Vous êtes trop loin pour nettoyer la cible !</string>
+    <string name="nettoyagecible1">Vous avez nettoyer la cible et n\'avez pas été detecté !</string>
+    <string name="nettoyagecible2">Vous avez nettoyer la cible, malheureusement vous avez été detecté </string>
+    <string name="nettoyagecible3">C\'est une catastrophe, vous n\'avez pas réussi à nettoyer la cible et avez été detecté ! </string>
+    <string name="nettoyagecible4">Vous avez été detecté et avez nettoyé la cible </string>
+    <string name="Navbar1">Vous êtes en mode ACTIF</string>
+    <string name="Navbar2">Vous êtes en mode PREPARER LE VOYAGE</string>
+    <string name="Navbar3">Vous êtes en mode VOYAGE</string>
+    <string name="Navbar4">Vous êtes en mode dESSUYER LES SALETEES</string>
+    <string name="Navbar5"> joueurs en ligne actuellement</string>
+    <string name="Navbar6">Il y a </string>
+    <string name="Navbar7">Mon equipe a </string>
+    <string name="Navbar8"> points</string>
+    <string name="Navbar9">L\'equipe adverse a </string>
+
+
 </resources>

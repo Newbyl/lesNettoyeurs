@@ -22,7 +22,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="10dp"
             android:fontFamily="@font/opensansregular"
-            android:text="@string/hello_amit_anand_how_are_you"
+            android:text="Salut,comment vas  tu"
             android:textColor="#212121"></TextView>
 
     </LinearLayout>
